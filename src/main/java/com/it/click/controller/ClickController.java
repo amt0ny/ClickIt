@@ -14,7 +14,7 @@ import com.it.click.entites.MainProfile;
 import com.it.click.service.IClickService;
 
 @RestController
-@RequestMapping("/clickit")
+@RequestMapping
 public class ClickController {
 	
 	@Autowired
