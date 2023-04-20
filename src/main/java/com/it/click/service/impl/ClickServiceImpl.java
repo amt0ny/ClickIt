@@ -5,14 +5,13 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Properties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-
 import com.it.click.common.EmailRequest;
 import com.it.click.common.EmailVarificationData;
 import com.it.click.common.LoginRequest;
 import com.it.click.entites.BasicProfile;
 import com.it.click.entites.MainProfile;
 import com.it.click.entites.SocialProfile;
+import com.it.click.exception.NoValueException;
 import com.it.click.repos.IBasicProfileRepo;
 import com.it.click.repos.IMainProfileRepo;
 import com.it.click.repos.ISocialProfileRepo;
@@ -73,18 +72,20 @@ public class ClickServiceImpl implements IClickService{
 	@Override
 	public boolean login(LoginRequest loginRequest) {
 		
+		if (!mainProfileRepo.existsByEmail(loginRequest.getEmail())) {
+			throw new NoValueException("login", "Bad Request", "Email not registered with us, please create an account");
+		}
+		
 		if (mainProfileRepo.existsByEmail(loginRequest.getEmail())) {
 			if (mainProfileRepo.findByEmail(loginRequest.getEmail()).get().getPassword().equals(loginRequest.getPassowrd())) {
 				
 				return true;
 			}else {
-				System.out.println("Password or Username is incorrect");
-				return false;
+				throw new NoValueException("login", "Bad Request", "Password or Username is incorrect");
 			}
 			
 		}else {
-			System.out.println("Email already registerd with us");
-			return false;
+			throw new NoValueException("login", "Bad Request", "Email already registerd with us");
 		}
 		
 	}
@@ -118,15 +119,10 @@ public class ClickServiceImpl implements IClickService{
 			
 			Transport.send(message);
 			
-			
 		} catch (Exception e) {
-			System.out.println("Exception thrown : found some error !!");
-			e.printStackTrace();
+			throw new NoValueException("sendEmail", "Bad Request", "Otp varification faild");
 		}
 	}
-	
-	
-	
 	
 	public String generateOtp(String name, String email) throws NoSuchAlgorithmException {
 
@@ -134,7 +130,6 @@ public class ClickServiceImpl implements IClickService{
         MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
         messageDigest.update(combination.getBytes());
         byte[] digest = messageDigest.digest();
-
 
         StringBuilder sb = new StringBuilder();
         for (byte b : digest) {
@@ -159,11 +154,9 @@ public class ClickServiceImpl implements IClickService{
 		
 		if (otp != null) {
 			if (emailVarificationData.getOtp().equals(otp)) {
-				System.out.println(emailVarificationData.getOtp() + "  "+ otp);
 				return true;
 			}else {
-				System.out.println("Otp varification faild");
-				return false;
+				throw new NoValueException("emailVarification", "Bad Request", "Otp varification faild");
 			}
 		}else {
 			return false;
@@ -174,7 +167,7 @@ public class ClickServiceImpl implements IClickService{
 	public String generateAndSendEmailOtp(EmailVarificationData emailVarificationData) {
 		
 		if (mainProfileRepo.existsByEmail(emailVarificationData.getTo())) {
-			return "Email already exists with us";
+			throw new NoValueException("generateAndSendEmailOtp", "Bad Request", "Email already exists with us");
 		}
 		
 		String otp = null; 
@@ -195,7 +188,7 @@ public class ClickServiceImpl implements IClickService{
 			sendEmail(emailRequest);
 			return "Otp sent successfully";
 		}else {
-			return "facing trouble while sending otp";
+			throw new NoValueException("generateAndSendEmailOtp", "Bad Request", "facing trouble while sending otp");
 		}
 	}
 }
