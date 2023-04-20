@@ -14,11 +14,16 @@ import com.it.click.entites.MainProfile;
 import com.it.click.service.IClickService;
 
 @RestController
-@RequestMapping("/ClickIt")
+@RequestMapping
 public class ClickController {
 	
 	@Autowired
 	private IClickService clickService;
+	
+	@GetMapping
+	public String test() {
+		return"Yes workiing";
+	}
 	
 	@GetMapping("/sendOtp")
 	public String sendOtp(@RequestBody EmailVarificationData emailVarificationData) {

@@ -79,6 +79,13 @@ public class ClickServiceImpl implements IClickService{
 		if (mainProfileRepo.existsByEmail(loginRequest.getEmail())) {
 			if (mainProfileRepo.findByEmail(loginRequest.getEmail()).get().getPassword().equals(loginRequest.getPassowrd())) {
 				
+				EmailRequest emailRequest = EmailRequest.builder()
+						.message("Logged in successfully")
+						.subject("Logged in ClickIt")
+						.to(loginRequest.getEmail())
+						.build();
+				sendEmail(emailRequest);
+				
 				return true;
 			}else {
 				throw new NoValueException("login", "Bad Request", "Password or Username is incorrect");
@@ -159,7 +166,7 @@ public class ClickServiceImpl implements IClickService{
 				throw new NoValueException("emailVarification", "Bad Request", "Otp varification faild");
 			}
 		}else {
-			return false;
+			throw new NoValueException("emailVarification", "Bad Request", "Otp cannot be null or empty");
 		}
 	}
 
