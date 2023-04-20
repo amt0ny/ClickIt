@@ -20,7 +20,7 @@ public class ClickController {
 	@Autowired
 	private IClickService clickService;
 	
-	@GetMapping("/sendOtp")
+	@PostMapping("/sendOtp")
 	public String sendOtp(@RequestBody EmailVarificationData emailVarificationData) {
 		
 		return clickService.generateAndSendEmailOtp(emailVarificationData);
