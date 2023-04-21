@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.it.click.common.EmailRequest;
 import com.it.click.common.EmailVarificationData;
 import com.it.click.common.LoginRequest;
 import com.it.click.entites.MainProfile;

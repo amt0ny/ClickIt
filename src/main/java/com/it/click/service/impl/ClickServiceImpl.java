@@ -77,7 +77,9 @@ public class ClickServiceImpl implements IClickService{
 		}
 		
 		if (mainProfileRepo.existsByEmail(loginRequest.getEmail())) {
-			// check working or not - findByEmail()
+			System.out.println(loginRequest.getEmail());
+			String email = loginRequest.getEmail();
+			System.out.println(mainProfileRepo.findByEmail(email));
 			if (mainProfileRepo.findByEmail(loginRequest.getEmail()).get().getPassword().equals(loginRequest.getPassowrd())) {
 				
 				EmailRequest emailRequest = EmailRequest.builder()
