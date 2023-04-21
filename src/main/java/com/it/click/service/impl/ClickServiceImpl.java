@@ -77,6 +77,7 @@ public class ClickServiceImpl implements IClickService{
 		}
 		
 		if (mainProfileRepo.existsByEmail(loginRequest.getEmail())) {
+			// check working or not - findByEmail()
 			if (mainProfileRepo.findByEmail(loginRequest.getEmail()).get().getPassword().equals(loginRequest.getPassowrd())) {
 				
 				EmailRequest emailRequest = EmailRequest.builder()
@@ -161,6 +162,13 @@ public class ClickServiceImpl implements IClickService{
 		
 		if (otp != null) {
 			if (emailVarificationData.getOtp().equals(otp)) {
+				EmailRequest emailRequest= EmailRequest.builder()
+						.message("Your have Signed-up successfully")
+						.subject("Sign up - ClickIt")
+						.to(emailVarificationData.getTo())
+						.build();
+				
+				sendEmail(emailRequest);
 				return true;
 			}else {
 				throw new NoValueException("emailVarification", "Bad Request", "Otp varification faild");
