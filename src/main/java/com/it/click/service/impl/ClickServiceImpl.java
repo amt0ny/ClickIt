@@ -163,6 +163,7 @@ public class ClickServiceImpl implements IClickService{
 		}
 		
 		if (otp != null) {
+			System.out.println("Otp is not null");
 			if (emailVarificationData.getOtp().equals(otp)) {
 				EmailRequest emailRequest= EmailRequest.builder()
 						.message("Your have Signed-up successfully")
@@ -171,6 +172,7 @@ public class ClickServiceImpl implements IClickService{
 						.build();
 				
 				sendEmail(emailRequest);
+				System.out.println("After sending email");
 				return true;
 			}else {
 				throw new NoValueException("emailVarification", "Bad Request", "Otp varification faild");
