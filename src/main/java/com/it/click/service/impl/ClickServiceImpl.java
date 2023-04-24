@@ -2,6 +2,7 @@ package com.it.click.service.impl;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Optional;
 import java.util.Properties;
 
 import javax.mail.Authenticator;
@@ -13,6 +14,9 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import com.it.click.common.EmailRequest;
 import com.it.click.common.EmailVarificationData;
@@ -27,7 +31,7 @@ import com.it.click.repos.ISocialProfileRepo;
 import com.it.click.service.IClickService;
 
 @Service
-public class ClickServiceImpl implements IClickService{
+public class ClickServiceImpl implements IClickService,UserDetailsService{
 	
 	@Autowired
 	private IMainProfileRepo mainProfileRepo;
@@ -79,9 +83,7 @@ public class ClickServiceImpl implements IClickService{
 		}
 		
 		if (mainProfileRepo.existsByEmail(loginRequest.getEmail())) {
-			System.out.println(loginRequest.getEmail());
-			String email = loginRequest.getEmail();
-			System.out.println(mainProfileRepo.findByEmail(email));
+			
 			if (mainProfileRepo.findByEmail(loginRequest.getEmail()).get().getPassword().equals(loginRequest.getPassowrd())) {
 				
 				EmailRequest emailRequest = EmailRequest.builder()
@@ -208,6 +210,16 @@ public class ClickServiceImpl implements IClickService{
 			return "Otp sent successfully";
 		}else {
 			throw new NoValueException("generateAndSendEmailOtp", "Bad Request", "facing trouble while sending otp");
+		}
+	}
+
+	@Override
+	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+		Optional<MainProfile> optional = mainProfileRepo.findByEmail(username);
+		if(optional.isPresent()) {
+			return optional.get();
+		}else {
+			throw new NoValueException("loadUserByUsername", "Bad Request", "User does not exists");
 		}
 	}
 }

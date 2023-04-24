@@ -19,6 +19,12 @@ public class ClickController {
 	@Autowired
 	private IClickService clickService;
 	
+	@GetMapping("/test")
+	public String test() {
+		return "Yes working";
+	}
+	
+	
 	@PostMapping("/sendOtp")
 	public String sendOtp(@RequestBody EmailVarificationData emailVarificationData) {
 		

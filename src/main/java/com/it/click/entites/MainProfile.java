@@ -1,8 +1,11 @@
 package com.it.click.entites;
 
+import java.util.Collection;
 import java.util.List;
 import javax.persistence.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 import com.it.click.common.Photo;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -12,7 +15,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-public class MainProfile {
+public class MainProfile implements UserDetails{
 	
 	@Id
 	private int id;
@@ -27,5 +30,31 @@ public class MainProfile {
 	private String profilePicture;
 	private List<String> hobbies;
 	private List<String> interest;
+	
+	
+	@Override
+	public Collection<? extends GrantedAuthority> getAuthorities() {
+		return null;
+	}
+	@Override
+	public String getUsername() {
+		return email;
+	}
+	@Override
+	public boolean isAccountNonExpired() {
+		return false;
+	}
+	@Override
+	public boolean isAccountNonLocked() {
+		return false;
+	}
+	@Override
+	public boolean isCredentialsNonExpired() {
+		return false;
+	}
+	@Override
+	public boolean isEnabled() {
+		return false;
+	}
 
 }
