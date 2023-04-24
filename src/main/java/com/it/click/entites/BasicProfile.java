@@ -1,7 +1,7 @@
 package com.it.click.entites;
 
 import org.springframework.data.mongodb.core.mapping.Document;
-import jakarta.persistence.Id;
+import javax.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

@@ -2,10 +2,8 @@ package com.it.click.entites;
 
 import java.util.List;
 import org.springframework.data.mongodb.core.mapping.Document;
-
 import com.it.click.common.Photo;
-
-import jakarta.persistence.Id;
+import javax.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

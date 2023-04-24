@@ -3,6 +3,15 @@ package com.it.click.service.impl;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Properties;
+
+import javax.mail.Authenticator;
+import javax.mail.Message;
+import javax.mail.PasswordAuthentication;
+import javax.mail.Session;
+import javax.mail.Transport;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.it.click.common.EmailRequest;
@@ -16,13 +25,6 @@ import com.it.click.repos.IBasicProfileRepo;
 import com.it.click.repos.IMainProfileRepo;
 import com.it.click.repos.ISocialProfileRepo;
 import com.it.click.service.IClickService;
-import jakarta.mail.Authenticator;
-import jakarta.mail.Message;
-import jakarta.mail.PasswordAuthentication;
-import jakarta.mail.Session;
-import jakarta.mail.Transport;
-import jakarta.mail.internet.InternetAddress;
-import jakarta.mail.internet.MimeMessage;
 
 @Service
 public class ClickServiceImpl implements IClickService{
@@ -97,7 +99,6 @@ public class ClickServiceImpl implements IClickService{
 		}else {
 			throw new NoValueException("login", "Bad Request", "Email already registerd with us");
 		}
-		
 	}
 	
 	public void sendEmail(EmailRequest emailRequest) {
@@ -158,7 +159,6 @@ public class ClickServiceImpl implements IClickService{
 		try {
 			 otp = generateOtp(emailVarificationData.getName(), emailVarificationData.getTo());
 		} catch (NoSuchAlgorithmException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		

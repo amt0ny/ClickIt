@@ -25,7 +25,7 @@ public class ClickController {
 		return clickService.generateAndSendEmailOtp(emailVarificationData);
 	}
 	
-	@GetMapping("/varifyEmail")
+	@PostMapping("/varifyOtp")
 	public boolean varifyEmailByOtp(@RequestBody EmailVarificationData emailVarificationData) {
 		
 		return clickService.emailVarification(emailVarificationData);
