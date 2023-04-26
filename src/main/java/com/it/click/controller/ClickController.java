@@ -7,8 +7,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.it.click.common.EmailVarificationData;
-import com.it.click.common.LoginRequest;
+import com.it.click.common.EmailVerificationData;
+import com.it.click.common.JwtResponse;
+import com.it.click.common.LoginData;
 import com.it.click.entites.MainProfile;
 import com.it.click.service.IClickService;
 
@@ -26,15 +27,15 @@ public class ClickController {
 	
 	
 	@PostMapping("/sendOtp")
-	public String sendOtp(@RequestBody EmailVarificationData emailVarificationData) {
+	public String sendOtp(@RequestBody LoginData loginData) {
 		
-		return clickService.generateAndSendEmailOtp(emailVarificationData);
+		return clickService.generateAndSendEmailOtp(loginData);
 	}
 	
 	@PostMapping("/varifyOtp")
-	public boolean varifyEmailByOtp(@RequestBody EmailVarificationData emailVarificationData) {
+	public boolean varifyEmailByOtp(@RequestBody LoginData loginData) {
 		
-		return clickService.emailVarification(emailVarificationData);
+		return clickService.emailVarification(loginData);
 	}
 	
 	@PostMapping("/signUp")
@@ -44,7 +45,7 @@ public class ClickController {
 	}
 	
 	@PostMapping("/login")
-	public boolean userLogin(@RequestBody LoginRequest loginRequest){
+	public JwtResponse userLogin(@RequestBody LoginData loginRequest){
 		
 		return clickService.login(loginRequest);
 	}

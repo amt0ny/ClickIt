@@ -1,17 +1,18 @@
 package com.it.click.service;
 
-import com.it.click.common.EmailVarificationData;
-import com.it.click.common.LoginRequest;
+import com.it.click.common.JwtResponse;
+import com.it.click.common.LoginData;
 import com.it.click.entites.MainProfile;
 
-public interface IClickService {
+
+public interface IClickService{
 
 	String addUser(MainProfile mainProfile);
 
-	boolean login(LoginRequest loginRequest);
+	JwtResponse login(LoginData loginRequest);
 
-	boolean emailVarification(EmailVarificationData emailVarificationData);
+	boolean emailVarification(LoginData loginData);
 
-	String generateAndSendEmailOtp(EmailVarificationData emailVarificationData);
+	String generateAndSendEmailOtp(LoginData loginData);
 
 }
