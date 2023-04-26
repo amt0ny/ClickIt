@@ -31,8 +31,6 @@ public class ClickConfiguration extends WebSecurityConfigurerAdapter{
 		http
 		.csrf()
 		.disable()
-		.cors()
-		.disable()
 		.authorizeRequests()
 		.antMatchers("/login","/signUp")
 		.permitAll()
