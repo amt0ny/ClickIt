@@ -56,8 +56,6 @@ public class ClickServiceImpl implements IClickService, UserDetailsService {
 	public String addUser(MainProfile mainProfile) {
 
 		mainProfile.setPassword(passwordEncoder().encode(mainProfile.getPassword()));
-		
-		MainProfile save = mainProfileRepo.save(mainProfile);
 
 		BasicProfile basicProfile = BasicProfile.builder().id(mainProfile.getId()).name(mainProfile.getName())
 				.lattitude(mainProfile.getLattitude()).longitude(mainProfile.getLongitude()).age(mainProfile.getAge())

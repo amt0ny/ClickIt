@@ -15,13 +15,14 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-
 import com.it.click.service.impl.ClickServiceImpl;
 
 @SuppressWarnings("deprecation")
 @Configuration
 @EnableWebSecurity
+@EnableWebMvc
 public class ClickConfiguration extends WebSecurityConfigurerAdapter {
 
 	@Autowired
@@ -39,17 +40,6 @@ public class ClickConfiguration extends WebSecurityConfigurerAdapter {
 	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
 
 		auth.userDetailsService(clickServiceImpl);
-	}
-
-	@Bean
-	public WebMvcConfigurer corsConfigurer() {
-		return new WebMvcConfigurer() {
-			@Override
-			public void addCorsMappings(CorsRegistry registry) {
-				registry.addMapping("/**").allowedMethods("GET", "POST", "PUT", "DELETE", "PATCH").allowedOrigins("*")
-						.allowedHeaders("*");
-			}
-		};
 	}
 
 	@Bean

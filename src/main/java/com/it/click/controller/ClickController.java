@@ -1,6 +1,7 @@
 package com.it.click.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -42,6 +43,7 @@ public class ClickController {
 		return clickService.addUser(mainProfile);
 	}
 	
+	@CrossOrigin("https://clickit-production.up.railway.app")
 	@PostMapping("/login")
 	public JwtResponse userLogin(@RequestBody LoginData loginRequest){
 		
