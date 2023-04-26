@@ -7,6 +7,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+
 import com.it.click.common.JwtResponse;
 import com.it.click.common.LoginData;
 import com.it.click.entites.MainProfile;
@@ -14,6 +16,7 @@ import com.it.click.service.IClickService;
 
 @RestController
 @RequestMapping
+@EnableWebMvc
 public class ClickController {
 	
 	@Autowired
