@@ -14,39 +14,44 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
 import com.it.click.service.impl.ClickServiceImpl;
 
 @SuppressWarnings("deprecation")
 @Configuration
 @EnableWebSecurity
-public class ClickConfiguration extends WebSecurityConfigurerAdapter{
+public class ClickConfiguration extends WebSecurityConfigurerAdapter {
 
 	@Autowired
 	private ClickServiceImpl clickServiceImpl;
-	
-	
+
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
-		
-		http
-		.csrf()
-		.disable()
-		.authorizeRequests()
-		.antMatchers("/login","/signUp")
-		.permitAll()
-		.anyRequest()
-		.authenticated()
-		.and()
-		.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-		
+
+		http.csrf().disable().authorizeRequests().antMatchers("/login", "/signUp").permitAll().anyRequest()
+				.authenticated().and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+
 	}
-	
+
 	@Override
 	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-		
+
 		auth.userDetailsService(clickServiceImpl);
 	}
-	
+
+	@Bean
+	public WebMvcConfigurer corsConfigurer() {
+		return new WebMvcConfigurer() {
+			@Override
+			public void addCorsMappings(CorsRegistry registry) {
+				registry.addMapping("/**").allowedMethods("GET", "POST", "PUT", "DELETE", "PATCH").allowedOrigins("*")
+						.allowedHeaders("*");
+			}
+		};
+	}
+
 	@Bean
 	public PasswordEncoder passwordEncoder() {
 
@@ -54,9 +59,9 @@ public class ClickConfiguration extends WebSecurityConfigurerAdapter{
 	}
 
 	@Bean
-	public AuthenticationProvider authenticationProvider(){
+	public AuthenticationProvider authenticationProvider() {
 
-		DaoAuthenticationProvider authenticationProvider=new DaoAuthenticationProvider();
+		DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
 
 		authenticationProvider.setUserDetailsService(userDetailsService());
 		authenticationProvider.setPasswordEncoder(passwordEncoder());
@@ -69,8 +74,5 @@ public class ClickConfiguration extends WebSecurityConfigurerAdapter{
 
 		return config.getAuthenticationManager();
 	}
-
-	
-	
 
 }
