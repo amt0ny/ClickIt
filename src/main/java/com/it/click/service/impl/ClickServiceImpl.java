@@ -2,7 +2,6 @@ package com.it.click.service.impl;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
 import java.util.Optional;
 import java.util.Properties;
 import javax.mail.Authenticator;
@@ -57,9 +56,8 @@ public class ClickServiceImpl implements IClickService, UserDetailsService {
 	public String addUser(MainProfile mainProfile) {
 
 		mainProfile.setPassword(passwordEncoder().encode(mainProfile.getPassword()));
-		System.out.println(mainProfile.getPassword());
+		
 		MainProfile save = mainProfileRepo.save(mainProfile);
-		System.out.println(save.getPassword());
 
 		BasicProfile basicProfile = BasicProfile.builder().id(mainProfile.getId()).name(mainProfile.getName())
 				.lattitude(mainProfile.getLattitude()).longitude(mainProfile.getLongitude()).age(mainProfile.getAge())
@@ -101,9 +99,8 @@ public class ClickServiceImpl implements IClickService, UserDetailsService {
 				EmailRequest emailRequest = EmailRequest.builder().message("Logged in successfully")
 						.subject("Logged in ClickIt").to(loginData.getEmail()).build();
 				JwtResponse token = new JwtResponse();
-				System.out.println("Before token");
+
 				token = generateTokenByEmailAndPassword(loginData.getEmail(), loginData.getPassword());
-				System.out.println("after token");
 				
 				if (token!=null) {
 					sendEmail(emailRequest);
@@ -243,21 +240,19 @@ public class ClickServiceImpl implements IClickService, UserDetailsService {
 	}
 
 	public JwtResponse generateTokenByEmailAndPassword(String email, String password) {
-		System.out.println("Inside generateTokenByEmailAndPassword");
+
 		try {
-			System.out.println(email+" "+password);
+
 			this.authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(email, password));
+			
 		} catch (Exception e) {
-			System.out.println("catch block");
+			
 			e.printStackTrace();
 		}
-		System.out.println("before loadByUserName");
 
 		UserDetails userDetails = loadUserByUsername(email);
-		System.out.println("This is user details "+userDetails);
+		
 		String token = jwtService.generateToken(userDetails);
-
-		System.out.println("This is token -> " + token);
 
 		return new JwtResponse(token);
 	}
