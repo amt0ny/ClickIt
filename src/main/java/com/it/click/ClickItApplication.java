@@ -18,9 +18,9 @@ public class ClickItApplication {
 		SpringApplication.run(ClickItApplication.class, args);
 	}
 
-	public void addCorsMappings(CorsRegistry registry) {
-		registry.addMapping("/**").allowedOrigins("*").allowedMethods("GET", "POST", "PUT", "DELETE")
-				.allowedHeaders("*").allowCredentials(true).maxAge(3600);
-	}
+//	public void addCorsMappings(CorsRegistry registry) {
+//		registry.addMapping("/**").allowedOrigins("*").allowedMethods("GET", "POST", "PUT", "DELETE")
+//				.allowedHeaders("*").allowCredentials(true).maxAge(3600);
+//	}
 
 }
