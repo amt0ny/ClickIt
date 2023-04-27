@@ -22,7 +22,6 @@ import com.it.click.service.impl.ClickServiceImpl;
 @SuppressWarnings("deprecation")
 @Configuration
 @EnableWebSecurity
-@EnableWebMvc
 public class ClickConfiguration extends WebSecurityConfigurerAdapter {
 
 	@Autowired
