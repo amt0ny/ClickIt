@@ -10,7 +10,7 @@ public interface IClickService{
 
 	String addUser(MainProfile mainProfile);
 
-	JwtResponse login(LoginData loginRequest);
+	JwtResponse login(EmailPass emailPass);
 
 	JwtResponse otpVarification(LoginData loginData);
 

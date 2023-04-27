@@ -48,9 +48,9 @@ public class ClickController {
 	}
 	
 	@PostMapping("/login")
-	public JwtResponse userLogin(@RequestBody LoginData loginRequest){
+	public JwtResponse userLogin(@RequestBody EmailPass emailPass){
 		
-		return clickService.login(loginRequest);
+		return clickService.login(emailPass);
 	}
 	
 }

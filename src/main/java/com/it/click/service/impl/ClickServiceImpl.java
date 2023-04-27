@@ -86,23 +86,23 @@ public class ClickServiceImpl implements IClickService, UserDetailsService {
 	}
 
 	@Override
-	public JwtResponse login(LoginData loginData) {
+	public JwtResponse login(EmailPass emailPass) {
 
-		if (!emailPassRepo.existsByEmail(loginData.getEmail())) {
+		if (!emailPassRepo.existsByEmail(emailPass.getEmail())) {
 			throw new NoValueException("login", "Bad Request",
 					"Email not registered with us, please create an account");
 		}
 
-		String pass = emailPassRepo.findByEmail(loginData.getEmail()).get().getPassword();
-		String rowPass = loginData.getPassword();
+		String pass = emailPassRepo.findByEmail(emailPass.getEmail()).get().getPassword();
+		String rowPass = emailPass.getPassword();
 
 		if (passwordEncoder().matches(rowPass, pass)) {
 
 			EmailRequest emailRequest = EmailRequest.builder().message("Logged in successfully")
-					.subject("Logged in ClickIt").to(loginData.getEmail()).build();
+					.subject("Logged in ClickIt").to(emailPass.getEmail()).build();
 			JwtResponse token = new JwtResponse();
 
-			token = generateTokenByEmailAndPassword(loginData.getEmail(), loginData.getPassword());
+			token = generateTokenByEmailAndPassword(emailPass.getEmail(), emailPass.getPassword());
 
 			if (token != null) {
 				sendEmail(emailRequest);
