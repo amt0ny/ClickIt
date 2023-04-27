@@ -46,7 +46,7 @@ public class ClickController {
 		return clickService.addUser(mainProfile);
 	}
 	
-	@CrossOrigin("https://clickit-production.up.railway.app")
+	@CrossOrigin("https://clickit-production.up.railway.app/")
 	@PostMapping("/login")
 	public JwtResponse userLogin(@RequestBody LoginData loginRequest){
 		
