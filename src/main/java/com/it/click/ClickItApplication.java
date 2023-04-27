@@ -10,26 +10,17 @@ import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
-@SpringBootApplication(exclude = {DataSourceAutoConfiguration.class })
+@SpringBootApplication(exclude = { DataSourceAutoConfiguration.class })
 @EnableSwagger2
 public class ClickItApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(ClickItApplication.class, args);
 	}
-	
-	@Configuration
-	public class CorsConfig implements WebMvcConfigurer {
-	 
-	  @Override
-	  public void addCorsMappings(CorsRegistry registry) {
-	    registry.addMapping("/**")
-	      .allowedOrigins("*")
-	      .allowedMethods("GET", "POST", "PUT", "DELETE")
-	      .allowedHeaders("*")
-	      .allowCredentials(true)
-	      .maxAge(3600);
-	  }
+
+	public void addCorsMappings(CorsRegistry registry) {
+		registry.addMapping("/**").allowedOrigins("*").allowedMethods("GET", "POST", "PUT", "DELETE")
+				.allowedHeaders("*").allowCredentials(true).maxAge(3600);
 	}
 
 }
