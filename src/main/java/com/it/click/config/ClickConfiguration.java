@@ -35,19 +35,17 @@ public class ClickConfiguration extends WebSecurityConfigurerAdapter {
 
 	}
 	
-	@Configuration
-	@EnableWebMvc
-	public class WebConfig implements WebMvcConfigurer {
-
-	    @Override
-	    public void addCorsMappings(CorsRegistry registry) {
-	        registry.addMapping("/**")
-	                .allowedOrigins("*")
-	                .allowedMethods("GET", "POST", "PUT", "DELETE")
-	                .allowedHeaders("*")
-	                .maxAge(3600);
-	    }
-	}
+//	@EnableWebMvc
+//	public class WebConfig implements WebMvcConfigurer {
+//
+//	    @Override
+//	    public void addCorsMappings(CorsRegistry registry) {
+//	        registry.addMapping("/**")
+//	                .allowedOrigins("*")
+//	                .allowedMethods("GET", "POST", "PUT", "DELETE")
+//	                .allowedHeaders("*");
+//	    }
+//	}
 
 	@Override
 	protected void configure(AuthenticationManagerBuilder auth) throws Exception {

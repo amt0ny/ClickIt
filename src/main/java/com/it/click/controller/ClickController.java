@@ -15,7 +15,7 @@ import com.it.click.common.LoginData;
 import com.it.click.entites.MainProfile;
 import com.it.click.service.IClickService;
 
-//@CrossOrigin(origins = "*", methods = { RequestMethod.POST }, allowedHeaders = "*")
+@CrossOrigin(origins = "*", methods = { RequestMethod.POST }, allowedHeaders = "*")
 @RestController
 @RequestMapping
 public class ClickController {
