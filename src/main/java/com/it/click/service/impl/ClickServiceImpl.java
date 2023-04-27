@@ -25,10 +25,12 @@ import com.it.click.common.EmailRequest;
 import com.it.click.common.JwtResponse;
 import com.it.click.common.LoginData;
 import com.it.click.entites.BasicProfile;
+import com.it.click.entites.EmailPass;
 import com.it.click.entites.MainProfile;
 import com.it.click.entites.SocialProfile;
 import com.it.click.exception.NoValueException;
 import com.it.click.repos.IBasicProfileRepo;
+import com.it.click.repos.IEmailPassRepo;
 import com.it.click.repos.IMainProfileRepo;
 import com.it.click.repos.ISocialProfileRepo;
 import com.it.click.service.IClickService;
@@ -52,6 +54,9 @@ public class ClickServiceImpl implements IClickService, UserDetailsService {
 	@Autowired
 	private JwtService jwtService;
 
+	@Autowired
+	private IEmailPassRepo emailPassRepo;
+
 	@Override
 	public String addUser(MainProfile mainProfile) {
 
@@ -66,13 +71,15 @@ public class ClickServiceImpl implements IClickService, UserDetailsService {
 				.gender(mainProfile.getGender()).hobbies(mainProfile.getHobbies()).interest(mainProfile.getInterest())
 				.photos(mainProfile.getPhotos()).build();
 
+		mainProfileRepo.save(mainProfile);
+
 		socialProfileRepo.save(socialProfile);
 
 		basicProfileRepo.save(basicProfile);
 
 		return "User added";
 	}
-	
+
 	@Bean
 	public PasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();
@@ -81,37 +88,30 @@ public class ClickServiceImpl implements IClickService, UserDetailsService {
 	@Override
 	public JwtResponse login(LoginData loginData) {
 
-		if (!mainProfileRepo.existsByEmail(loginData.getEmail())) {
+		if (!emailPassRepo.existsByEmail(loginData.getEmail())) {
 			throw new NoValueException("login", "Bad Request",
 					"Email not registered with us, please create an account");
 		}
 
-		if (mainProfileRepo.existsByEmail(loginData.getEmail())) {
+		String pass = emailPassRepo.findByEmail(loginData.getEmail()).get().getPassword();
+		String rowPass = loginData.getPassword();
 
-			String pass = mainProfileRepo.findByEmail(loginData.getEmail()).get().getPassword();
-			String rowPass = loginData.getPassword();
-			
-			if(passwordEncoder().matches(rowPass, pass))
-			{
+		if (passwordEncoder().matches(rowPass, pass)) {
 
-				EmailRequest emailRequest = EmailRequest.builder().message("Logged in successfully")
-						.subject("Logged in ClickIt").to(loginData.getEmail()).build();
-				JwtResponse token = new JwtResponse();
+			EmailRequest emailRequest = EmailRequest.builder().message("Logged in successfully")
+					.subject("Logged in ClickIt").to(loginData.getEmail()).build();
+			JwtResponse token = new JwtResponse();
 
-				token = generateTokenByEmailAndPassword(loginData.getEmail(), loginData.getPassword());
-				
-				if (token!=null) {
-					sendEmail(emailRequest);
-				}
+			token = generateTokenByEmailAndPassword(loginData.getEmail(), loginData.getPassword());
 
-				return token;
-				
-			} else {
-				throw new NoValueException("login", "Bad Request", "Password or Username is incorrect");
+			if (token != null) {
+				sendEmail(emailRequest);
 			}
 
+			return token;
+
 		} else {
-			throw new NoValueException("login", "Bad Request", "Email already registerd with us");
+			throw new NoValueException("login", "Bad Request", "Password or Username is incorrect");
 		}
 	}
 
@@ -151,6 +151,10 @@ public class ClickServiceImpl implements IClickService, UserDetailsService {
 
 	public String generateOtp(String name, String email) throws NoSuchAlgorithmException {
 
+		if (emailPassRepo.existsByEmail(email)) {
+			throw new NoValueException("generateOtp", "Bad Request", "Email already registered with us '"+email+"'");
+		}
+
 		String combination = name + email;
 		MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
 		messageDigest.update(combination.getBytes());
@@ -168,7 +172,7 @@ public class ClickServiceImpl implements IClickService, UserDetailsService {
 	}
 
 	@Override
-	public boolean emailVarification(LoginData loginData) {
+	public JwtResponse otpVarification(LoginData loginData) {
 		String otp = null;
 		try {
 			otp = generateOtp(loginData.getPassword(), loginData.getEmail());
@@ -183,29 +187,44 @@ public class ClickServiceImpl implements IClickService, UserDetailsService {
 				EmailRequest emailRequest = EmailRequest.builder().message("Your have Signed-up successfully")
 						.subject("Sign up - ClickIt").to(loginData.getEmail()).build();
 
-				sendEmail(emailRequest);
+				EmailPass emailPass = new EmailPass();
+				emailPass.setEmail(loginData.getEmail());
+				emailPass.setPassword(passwordEncoder().encode(loginData.getPassword()));
 
-				return true;
+				emailPassRepo.save(emailPass);
+
+				JwtResponse token = generateTokenByEmailAndPassword(loginData.getEmail(), loginData.getPassword());
+
+				if (token != null && !token.equals("")) {
+
+					sendEmail(emailRequest);
+
+				} else {
+					throw new NoValueException("otpVarification", "Bad Request", "token was null or empty");
+				}
+
+				return token;
 
 			} else {
-				throw new NoValueException("emailVarification", "Bad Request", "Otp varification faild");
+				throw new NoValueException("otpVarification", "Bad Request", "Otp didn't match");
 			}
 
 		} else {
-			throw new NoValueException("emailVarification", "Bad Request", "Otp cannot be null or empty");
+			throw new NoValueException("otpVarification", "Bad Request", "Otp cannot be null or empty");
 		}
 	}
 
 	@Override
-	public String generateAndSendEmailOtp(LoginData loginData) {
-		if (mainProfileRepo.existsByEmail(loginData.getEmail())) {
+	public String generateAndSendEmailOtp(EmailPass emailPass) {
+
+		if (mainProfileRepo.existsByEmail(emailPass.getEmail())) {
 			throw new NoValueException("generateAndSendEmailOtp", "Bad Request", "Email already exists with us");
 		}
 
 		String otp = null;
 		try {
 
-			otp = generateOtp(loginData.getPassword(), loginData.getEmail());
+			otp = generateOtp(emailPass.getPassword(), emailPass.getEmail());
 
 		} catch (NoSuchAlgorithmException e) {
 
@@ -215,7 +234,7 @@ public class ClickServiceImpl implements IClickService, UserDetailsService {
 		if (otp != null) {
 
 			EmailRequest emailRequest = EmailRequest.builder().message("Your one time password is " + otp)
-					.subject("OTP varification from ClickIt").to(loginData.getEmail()).build();
+					.subject("OTP varification from ClickIt").to(emailPass.getEmail()).build();
 
 			sendEmail(emailRequest);
 
@@ -228,8 +247,8 @@ public class ClickServiceImpl implements IClickService, UserDetailsService {
 
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-		
-		Optional<MainProfile> optional = mainProfileRepo.findByEmail(username);
+
+		Optional<EmailPass> optional = emailPassRepo.findByEmail(username);
 		if (optional.isPresent()) {
 			return optional.get();
 		} else {
@@ -240,16 +259,16 @@ public class ClickServiceImpl implements IClickService, UserDetailsService {
 	public JwtResponse generateTokenByEmailAndPassword(String email, String password) {
 
 		try {
-
+			
 			this.authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(email, password));
-			
+
 		} catch (Exception e) {
-			
 			e.printStackTrace();
+			throw new NoValueException("loadUserByUsername", "Bad Request", "User does not exists");
 		}
 
 		UserDetails userDetails = loadUserByUsername(email);
-		
+
 		String token = jwtService.generateToken(userDetails);
 
 		return new JwtResponse(token);

@@ -36,7 +36,7 @@ public class ClickConfiguration extends WebSecurityConfigurerAdapter {
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
 
-		http.csrf().disable().authorizeRequests().antMatchers("/login", "/sendOtp").permitAll().anyRequest()
+		http.csrf().disable().authorizeRequests().antMatchers("/login", "/sendOtp","/varifyOtp").permitAll().anyRequest()
 				.authenticated().and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
 	}

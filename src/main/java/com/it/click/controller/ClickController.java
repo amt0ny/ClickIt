@@ -12,6 +12,7 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 import com.it.click.common.JwtResponse;
 import com.it.click.common.LoginData;
+import com.it.click.entites.EmailPass;
 import com.it.click.entites.MainProfile;
 import com.it.click.service.IClickService;
 
@@ -29,15 +30,15 @@ public class ClickController {
 	}
 
 	@PostMapping("/sendOtp")
-	public String sendOtp(@RequestBody LoginData loginData) {
+	public String sendOtp(@RequestBody EmailPass emailPass) {
 		
-		return clickService.generateAndSendEmailOtp(loginData);
+		return clickService.generateAndSendEmailOtp(emailPass);
 	}
 	
 	@PostMapping("/varifyOtp")
-	public boolean varifyEmailByOtp(@RequestBody LoginData loginData) {
+	public JwtResponse varifyEmailByOtp(@RequestBody LoginData loginData) {
 		
-		return clickService.emailVarification(loginData);
+		return clickService.otpVarification(loginData);
 	}
 	
 	@PostMapping("/signUp")

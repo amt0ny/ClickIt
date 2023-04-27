@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-public class MainProfile implements UserDetails{
+public class MainProfile{
 	
 	@Id
 	private int id;
@@ -30,31 +30,5 @@ public class MainProfile implements UserDetails{
 	private String profilePicture;
 	private List<String> hobbies;
 	private List<String> interest;
-	
-	
-	@Override
-	public Collection<? extends GrantedAuthority> getAuthorities() {
-		return null;
-	}
-	@Override
-	public String getUsername() {
-		return email;
-	}
-	@Override
-	public boolean isAccountNonExpired() {
-		return true;
-	}
-	@Override
-	public boolean isAccountNonLocked() {
-		return true;
-	}
-	@Override
-	public boolean isCredentialsNonExpired() {
-		return true;
-	}
-	@Override
-	public boolean isEnabled() {
-		return true;
-	}
 
 }

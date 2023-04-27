@@ -2,6 +2,7 @@ package com.it.click.service;
 
 import com.it.click.common.JwtResponse;
 import com.it.click.common.LoginData;
+import com.it.click.entites.EmailPass;
 import com.it.click.entites.MainProfile;
 
 
@@ -11,8 +12,8 @@ public interface IClickService{
 
 	JwtResponse login(LoginData loginRequest);
 
-	boolean emailVarification(LoginData loginData);
+	JwtResponse otpVarification(LoginData loginData);
 
-	String generateAndSendEmailOtp(LoginData loginData);
+	String generateAndSendEmailOtp(EmailPass emailPass);
 
 }
