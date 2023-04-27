@@ -16,7 +16,6 @@ import com.it.click.service.IClickService;
 
 @RestController
 @RequestMapping
-@EnableWebMvc
 public class ClickController {
 	
 	@Autowired
@@ -26,8 +25,7 @@ public class ClickController {
 	public String test() {
 		return "Yes working";
 	}
-	
-	
+
 	@PostMapping("/sendOtp")
 	public String sendOtp(@RequestBody LoginData loginData) {
 		
@@ -46,12 +44,10 @@ public class ClickController {
 		return clickService.addUser(mainProfile);
 	}
 	
-	@CrossOrigin("https://clickit-production.up.railway.app/")
 	@PostMapping("/login")
 	public JwtResponse userLogin(@RequestBody LoginData loginRequest){
 		
 		return clickService.login(loginRequest);
 	}
 	
-
 }
