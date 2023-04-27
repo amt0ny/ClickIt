@@ -4,6 +4,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -17,23 +18,18 @@ public class ClickItApplication {
 		SpringApplication.run(ClickItApplication.class, args);
 	}
 	
-//    @Bean
-//    public MongoClientOptions mongoOptions() {
-//        return MongoClientOptions
-//            .builder()
-//            .maxConnectionIdleTime(60000)
-//            .build();
-//    }
-    
-//	@Bean
-//	public WebMvcConfigurer corsConfigurer() {
-//		return new WebMvcConfigurer() {
-//			@Override
-//			public void addCorsMappings(CorsRegistry registry) {
-//				registry.addMapping("/**").allowedMethods("GET", "POST", "PUT", "DELETE", "PATCH").allowedOrigins("*")
-//						.allowedHeaders("*");
-//			}
-//		};
-//	}
+	@Configuration
+	public class CorsConfig implements WebMvcConfigurer {
+	 
+	  @Override
+	  public void addCorsMappings(CorsRegistry registry) {
+	    registry.addMapping("/**")
+	      .allowedOrigins("*")
+	      .allowedMethods("GET", "POST", "PUT", "DELETE")
+	      .allowedHeaders("*")
+	      .allowCredentials(true)
+	      .maxAge(3600);
+	  }
+	}
 
 }
