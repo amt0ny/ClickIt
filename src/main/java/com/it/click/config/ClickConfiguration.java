@@ -34,6 +34,20 @@ public class ClickConfiguration extends WebSecurityConfigurerAdapter {
 				.authenticated().and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
 	}
+	
+	@Configuration
+	@EnableWebMvc
+	public class WebConfig implements WebMvcConfigurer {
+
+	    @Override
+	    public void addCorsMappings(CorsRegistry registry) {
+	        registry.addMapping("/**")
+	                .allowedOrigins("*")
+	                .allowedMethods("GET", "POST", "PUT", "DELETE")
+	                .allowedHeaders("*")
+	                .maxAge(3600);
+	    }
+	}
 
 	@Override
 	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
