@@ -2,6 +2,8 @@ package com.it.click.service.impl;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.Optional;
 import java.util.Properties;
 import javax.mail.Authenticator;
@@ -58,30 +60,36 @@ public class ClickServiceImpl implements IClickService, UserDetailsService {
 	private IEmailPassRepo emailPassRepo;
 
 	@Override
-	public String addUser(MainProfile mainProfile) {
+	public String signUp(MainProfile mainProfile, String token) {
+		
+		if (verifyToken(token)) {
+			
+			mainProfile.setPassword(passwordEncoder().encode(mainProfile.getPassword()));
 
-		mainProfile.setPassword(passwordEncoder().encode(mainProfile.getPassword()));
+			BasicProfile basicProfile = BasicProfile.builder().id(mainProfile.getId()).name(mainProfile.getName())
+					.lattitude(mainProfile.getLattitude()).longitude(mainProfile.getLongitude()).age(mainProfile.getAge())
+					.gender(mainProfile.getGender()).photo(mainProfile.getProfilePicture()).build();
 
-		BasicProfile basicProfile = BasicProfile.builder().id(mainProfile.getId()).name(mainProfile.getName())
-				.lattitude(mainProfile.getLattitude()).longitude(mainProfile.getLongitude()).age(mainProfile.getAge())
-				.gender(mainProfile.getGender()).photo(mainProfile.getProfilePicture()).build();
+			SocialProfile socialProfile = SocialProfile.builder().id(mainProfile.getId()).name(mainProfile.getName())
+					.lattitude(mainProfile.getLattitude()).longitude(mainProfile.getLongitude())
+					.gender(mainProfile.getGender()).hobbies(mainProfile.getHobbies()).interest(mainProfile.getInterest())
+					.photos(mainProfile.getPhotos()).build();
 
-		SocialProfile socialProfile = SocialProfile.builder().id(mainProfile.getId()).name(mainProfile.getName())
-				.lattitude(mainProfile.getLattitude()).longitude(mainProfile.getLongitude())
-				.gender(mainProfile.getGender()).hobbies(mainProfile.getHobbies()).interest(mainProfile.getInterest())
-				.photos(mainProfile.getPhotos()).build();
+			mainProfileRepo.save(mainProfile);
 
-		mainProfileRepo.save(mainProfile);
+			socialProfileRepo.save(socialProfile);
 
-		socialProfileRepo.save(socialProfile);
+			basicProfileRepo.save(basicProfile);
 
-		basicProfileRepo.save(basicProfile);
-
-		return "User added";
+			return "User added";
+		}else {
+			throw new NoValueException("signUp", "Bad Request", "Your session time to use this app is expired, login again to use");
+		}
 	}
 
 	@Bean
 	public PasswordEncoder passwordEncoder() {
+		
 		return new BCryptPasswordEncoder();
 	}
 
@@ -241,6 +249,7 @@ public class ClickServiceImpl implements IClickService, UserDetailsService {
 			return "Otp sent successfully";
 
 		} else {
+			
 			throw new NoValueException("generateAndSendEmailOtp", "Bad Request", "facing trouble while sending otp");
 		}
 	}
@@ -249,9 +258,13 @@ public class ClickServiceImpl implements IClickService, UserDetailsService {
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 
 		Optional<EmailPass> optional = emailPassRepo.findByEmail(username);
+		
 		if (optional.isPresent()) {
+			
 			return optional.get();
+			
 		} else {
+			
 			throw new NoValueException("loadUserByUsername", "Bad Request", "User does not exists");
 		}
 	}
@@ -264,6 +277,7 @@ public class ClickServiceImpl implements IClickService, UserDetailsService {
 
 		} catch (Exception e) {
 			e.printStackTrace();
+			
 			throw new NoValueException("loadUserByUsername", "Bad Request", "User does not exists");
 		}
 
@@ -272,5 +286,30 @@ public class ClickServiceImpl implements IClickService, UserDetailsService {
 		String token = jwtService.generateToken(userDetails);
 
 		return new JwtResponse(token);
+		
+	}
+	
+	
+	private boolean verifyToken(String bearer) {
+		
+		if(bearer.isEmpty())
+			return false;
+		
+		String token = bearer.split(" ")[1];
+		Date expirationDate = new Date();
+		try {
+			expirationDate = jwtService.extractExpiration(token);
+		} catch (Exception e) {
+			return false;
+		}
+
+		
+		System.out.println(expirationDate);
+		System.out.println(new Date());
+		
+		if (expirationDate.before(new Date()))
+			return false;
+	
+		return true;
 	}
 }

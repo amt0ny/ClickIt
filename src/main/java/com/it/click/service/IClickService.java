@@ -8,7 +8,7 @@ import com.it.click.entites.MainProfile;
 
 public interface IClickService{
 
-	String addUser(MainProfile mainProfile);
+	String signUp(MainProfile mainProfile, String token);
 
 	JwtResponse login(EmailPass emailPass);
 

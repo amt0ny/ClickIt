@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -15,6 +16,8 @@ import com.it.click.common.LoginData;
 import com.it.click.entites.EmailPass;
 import com.it.click.entites.MainProfile;
 import com.it.click.service.IClickService;
+
+import io.swagger.annotations.Authorization;
 
 @CrossOrigin(origins = "*", methods = { RequestMethod.POST }, allowedHeaders = "*")
 @RestController
@@ -42,9 +45,9 @@ public class ClickController {
 	}
 	
 	@PostMapping("/signUp")
-	public String addUser(@RequestBody MainProfile mainProfile) {
+	public String addUser(@RequestBody MainProfile mainProfile, @RequestHeader String token) {
 		
-		return clickService.addUser(mainProfile);
+		return clickService.signUp(mainProfile,token);
 	}
 	
 	@PostMapping("/login")

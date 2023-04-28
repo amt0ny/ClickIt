@@ -1,11 +1,8 @@
 package com.it.click.entites;
 
-import java.util.Collection;
 import java.util.List;
 import javax.persistence.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 import com.it.click.common.Photo;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -15,8 +12,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-public class MainProfile{
-	
+public class MainProfile {
+
 	@Id
 	private int id;
 	private String name;

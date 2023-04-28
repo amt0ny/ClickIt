@@ -36,23 +36,10 @@ public class ClickConfiguration extends WebSecurityConfigurerAdapter {
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
 
-		http.csrf().disable().authorizeRequests().antMatchers("/login", "/sendOtp","/varifyOtp").permitAll().anyRequest()
+		http.csrf().disable().authorizeRequests().antMatchers("/login", "/sendOtp","/varifyOtp","/signUp").permitAll().anyRequest()
 				.authenticated().and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
 	}
-
-//	@Bean
-//	public CorsConfigurationSource corsConfigurationSource() {
-//		CorsConfiguration configuration = new CorsConfiguration();
-//		configuration.setAllowedOrigins(Collections.singletonList("*"));
-//		configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE"));
-//		configuration.setAllowedHeaders(Collections.singletonList("*"));
-//		configuration.setAllowCredentials(true);
-//
-//		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-//		source.registerCorsConfiguration("/**", configuration);
-//		return source;
-//	}
 
 	@Override
 	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
