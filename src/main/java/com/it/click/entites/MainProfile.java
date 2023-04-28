@@ -15,17 +15,17 @@ import lombok.NoArgsConstructor;
 public class MainProfile {
 
 	@Id
-	private int id;
+	private String id;
+	private String userId;
 	private String name;
-	private String email;
-	private String password;
 	private Double longitude;
 	private Double lattitude;
 	private int age;
 	private String gender;
 	private List<Photo> photos;
-	private String profilePicture;
-	private List<String> hobbies;
+	private int maxAgeRange;
+	private int maximumDistance;
+	private String interestedGender;
 	private List<String> interest;
 
 }

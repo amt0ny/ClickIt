@@ -16,8 +16,7 @@ import lombok.NoArgsConstructor;
 @Builder
 public class SocialProfile {
 
-	@Id
-	private Integer id;
+	private String userId;
 	private String name;
 	private Double longitude;
 	private Double lattitude;

@@ -17,10 +17,11 @@ import lombok.NoArgsConstructor;
 @Data
 @Builder
 @Document(collection = "EmailPass")
-public class EmailPass  implements UserDetails{
+public class EmailPass implements UserDetails{
 	
 	@Id
 	@Indexed(unique = true)
+	private String id;
 	private String email;
 	private String password;
 	

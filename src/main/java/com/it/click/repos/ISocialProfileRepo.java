@@ -5,6 +5,6 @@ import org.springframework.stereotype.Repository;
 import com.it.click.entites.SocialProfile;
 
 @Repository
-public interface ISocialProfileRepo extends MongoRepository<SocialProfile, Integer>{
+public interface ISocialProfileRepo extends MongoRepository<SocialProfile, String>{
 
 }

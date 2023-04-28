@@ -5,6 +5,6 @@ import org.springframework.stereotype.Repository;
 import com.it.click.entites.BasicProfile;
 
 @Repository
-public interface IBasicProfileRepo extends MongoRepository<BasicProfile, Integer>{
+public interface IBasicProfileRepo extends MongoRepository<BasicProfile, String>{
 
 }

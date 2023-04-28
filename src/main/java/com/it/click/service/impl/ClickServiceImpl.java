@@ -62,17 +62,21 @@ public class ClickServiceImpl implements IClickService, UserDetailsService {
 	@Override
 	public String signUp(MainProfile mainProfile, String token) {
 		
+		String userEmail = jwtService.extractUsername(token);
+		
+		Optional<EmailPass> user = emailPassRepo.findByEmail(userEmail);
+		
+		String userId = user.get().getId();
+		
 		if (verifyToken(token)) {
-			
-			mainProfile.setPassword(passwordEncoder().encode(mainProfile.getPassword()));
 
-			BasicProfile basicProfile = BasicProfile.builder().id(mainProfile.getId()).name(mainProfile.getName())
+			BasicProfile basicProfile = BasicProfile.builder().userId(userId).name(mainProfile.getName())
 					.lattitude(mainProfile.getLattitude()).longitude(mainProfile.getLongitude()).age(mainProfile.getAge())
-					.gender(mainProfile.getGender()).photo(mainProfile.getProfilePicture()).build();
+					.gender(mainProfile.getGender()).build();
 
-			SocialProfile socialProfile = SocialProfile.builder().id(mainProfile.getId()).name(mainProfile.getName())
+			SocialProfile socialProfile = SocialProfile.builder().userId(userId).name(mainProfile.getName())
 					.lattitude(mainProfile.getLattitude()).longitude(mainProfile.getLongitude())
-					.gender(mainProfile.getGender()).hobbies(mainProfile.getHobbies()).interest(mainProfile.getInterest())
+					.gender(mainProfile.getGender()).interest(mainProfile.getInterest())
 					.photos(mainProfile.getPhotos()).build();
 
 			mainProfileRepo.save(mainProfile);
@@ -225,8 +229,8 @@ public class ClickServiceImpl implements IClickService, UserDetailsService {
 	@Override
 	public String generateAndSendEmailOtp(EmailPass emailPass) {
 
-		if (mainProfileRepo.existsByEmail(emailPass.getEmail())) {
-			throw new NoValueException("generateAndSendEmailOtp", "Bad Request", "Email already exists with us");
+		if (emailPassRepo.existsByEmail(emailPass.getEmail())) {
+			throw new NoValueException("generateAndSendEmailOtp", "Bad Request", "Email already registered with us");
 		}
 
 		String otp = null;

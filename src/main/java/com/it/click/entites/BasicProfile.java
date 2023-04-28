@@ -13,9 +13,8 @@ import lombok.NoArgsConstructor;
 @Data
 @Builder
 public class BasicProfile {
-	
-	@Id
-	private int id;
+
+	private String userId;
 	private String name;
 	private Double longitude;
 	private Double lattitude;
