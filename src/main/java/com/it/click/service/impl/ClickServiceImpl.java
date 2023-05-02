@@ -60,40 +60,37 @@ public class ClickServiceImpl implements IClickService, UserDetailsService {
 	private IEmailPassRepo emailPassRepo;
 
 	@Override
-	public String signUp(MainProfile mainProfile, String token) {
-		
+	public String signUp(MainProfile mainProfile, String bToken) {
+
+		String token = verifyToken(bToken);
+
 		String userEmail = jwtService.extractUsername(token);
-		
+
 		Optional<EmailPass> user = emailPassRepo.findByEmail(userEmail);
-		
+
 		String userId = user.get().getId();
-		
-		if (verifyToken(token)) {
 
-			BasicProfile basicProfile = BasicProfile.builder().userId(userId).name(mainProfile.getName())
-					.lattitude(mainProfile.getLattitude()).longitude(mainProfile.getLongitude()).age(mainProfile.getAge())
-					.gender(mainProfile.getGender()).build();
+		BasicProfile basicProfile = BasicProfile.builder().userId(userId).name(mainProfile.getName())
+				.lattitude(mainProfile.getLattitude()).longitude(mainProfile.getLongitude()).age(mainProfile.getAge())
+				.gender(mainProfile.getGender()).build();
 
-			SocialProfile socialProfile = SocialProfile.builder().userId(userId).name(mainProfile.getName())
-					.lattitude(mainProfile.getLattitude()).longitude(mainProfile.getLongitude())
-					.gender(mainProfile.getGender()).interest(mainProfile.getInterest())
-					.photos(mainProfile.getPhotos()).build();
+		SocialProfile socialProfile = SocialProfile.builder().userId(userId).name(mainProfile.getName())
+				.lattitude(mainProfile.getLattitude()).longitude(mainProfile.getLongitude())
+				.gender(mainProfile.getGender()).interest(mainProfile.getInterest()).photos(mainProfile.getPhotos())
+				.build();
 
-			mainProfileRepo.save(mainProfile);
+		mainProfileRepo.save(mainProfile);
 
-			socialProfileRepo.save(socialProfile);
+		socialProfileRepo.save(socialProfile);
 
-			basicProfileRepo.save(basicProfile);
+		basicProfileRepo.save(basicProfile);
 
-			return "User added";
-		}else {
-			throw new NoValueException("signUp", "Bad Request", "Your session time to use this app is expired, login again to use");
-		}
+		return "User added";
 	}
 
 	@Bean
 	public PasswordEncoder passwordEncoder() {
-		
+
 		return new BCryptPasswordEncoder();
 	}
 
@@ -164,7 +161,8 @@ public class ClickServiceImpl implements IClickService, UserDetailsService {
 	public String generateOtp(String name, String email) throws NoSuchAlgorithmException {
 
 		if (emailPassRepo.existsByEmail(email)) {
-			throw new NoValueException("generateOtp", "Bad Request", "Email already registered with us '"+email+"'");
+			throw new NoValueException("generateOtp", "Bad Request",
+					"Email already registered with us '" + email + "'");
 		}
 
 		String combination = name + email;
@@ -253,7 +251,7 @@ public class ClickServiceImpl implements IClickService, UserDetailsService {
 			return "Otp sent successfully";
 
 		} else {
-			
+
 			throw new NoValueException("generateAndSendEmailOtp", "Bad Request", "facing trouble while sending otp");
 		}
 	}
@@ -262,13 +260,13 @@ public class ClickServiceImpl implements IClickService, UserDetailsService {
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 
 		Optional<EmailPass> optional = emailPassRepo.findByEmail(username);
-		
+
 		if (optional.isPresent()) {
-			
+
 			return optional.get();
-			
+
 		} else {
-			
+
 			throw new NoValueException("loadUserByUsername", "Bad Request", "User does not exists");
 		}
 	}
@@ -276,12 +274,12 @@ public class ClickServiceImpl implements IClickService, UserDetailsService {
 	public JwtResponse generateTokenByEmailAndPassword(String email, String password) {
 
 		try {
-			
+
 			this.authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(email, password));
 
 		} catch (Exception e) {
 			e.printStackTrace();
-			
+
 			throw new NoValueException("loadUserByUsername", "Bad Request", "User does not exists");
 		}
 
@@ -290,30 +288,26 @@ public class ClickServiceImpl implements IClickService, UserDetailsService {
 		String token = jwtService.generateToken(userDetails);
 
 		return new JwtResponse(token);
-		
+
 	}
-	
-	
-	private boolean verifyToken(String bearer) {
+
+	private String verifyToken(String bearer) {
+
+		if (bearer.isEmpty())
+			throw new NoValueException("verifyToken", "Bad Request", "Empty token");
+
+		String[] token = bearer.split(" ");
 		
-		if(bearer.isEmpty())
-			return false;
-		
-		String token = bearer.split(" ")[1];
-		Date expirationDate = new Date();
+		Date expirationDate;
 		try {
-			expirationDate = jwtService.extractExpiration(token);
+			expirationDate = jwtService.extractExpiration(token[1]);
 		} catch (Exception e) {
-			return false;
+			throw new NoValueException("verifyToken", "Bad Request", "Invalid token");
 		}
 
-		
-		System.out.println(expirationDate);
-		System.out.println(new Date());
-		
 		if (expirationDate.before(new Date()))
-			return false;
-	
-		return true;
+			throw new NoValueException("verifyToken", "Bad Request", "Invalid token");
+
+		return token[1];
 	}
 }
