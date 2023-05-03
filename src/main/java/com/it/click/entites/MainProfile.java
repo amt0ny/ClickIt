@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 public class MainProfile {
 
 	@Id
-	private String id;
+	private String emailId;
 	private String name;
 	private Double longitude;
 	private Double lattitude;

@@ -1,6 +1,5 @@
 package com.it.click.controller;
 
-import java.util.ArrayList;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -58,7 +57,7 @@ public class ClickController {
 	
 	@GetMapping("/getUserDashBoard")
 	public List<BasicProfile> getUsersList(@RequestHeader String token){
-		System.out.println("inside API");
+
 		return clickService.getUserDashBoardByIntereset(token);
 
 	}

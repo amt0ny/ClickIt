@@ -68,23 +68,19 @@ public class ClickServiceImpl implements IClickService, UserDetailsService {
 
 		String token = verifyToken(bToken);
 
-		String userEmail = jwtService.extractUsername(token);
+		String emailId = jwtService.extractUsername(token);
 
-		Optional<EmailPass> user = emailPassRepo.findByEmail(userEmail);
-
-		String userId = user.get().getId();
-
-		BasicProfile basicProfile = BasicProfile.builder().userId(userId).name(mainProfile.getName())
+		BasicProfile basicProfile = BasicProfile.builder().userId(emailId).name(mainProfile.getName())
 				.lattitude(mainProfile.getLattitude()).longitude(mainProfile.getLongitude()).age(mainProfile.getAge())
 				.gender(mainProfile.getGender()).build();
 
-		SocialProfile socialProfile = SocialProfile.builder().userId(userId).name(mainProfile.getName()).age(mainProfile.getAge())
+		SocialProfile socialProfile = SocialProfile.builder().userId(emailId).name(mainProfile.getName())
 				.lattitude(mainProfile.getLattitude()).longitude(mainProfile.getLongitude())
 				.gender(mainProfile.getGender()).interest(mainProfile.getInterest()).photos(mainProfile.getPhotos())
 				.build();
-
-		mainProfile.setId(userId);
 		
+		mainProfile.setEmailId(emailId);
+
 		mainProfileRepo.save(mainProfile);
 
 		socialProfileRepo.save(socialProfile);
@@ -324,13 +320,9 @@ public class ClickServiceImpl implements IClickService, UserDetailsService {
 		
 		String email = jwtService.extractUsername(token);
 		
-		Optional<EmailPass> emailPassObj = emailPassRepo.findByEmail(email);
-		System.out.println(emailPassObj);
-		String id = emailPassObj.get().getId();
-		
-		System.out.println(id);
+		emailPassRepo.findByEmail(email);
 
-		Optional<MainProfile> mainProfile = mainProfileRepo.findById(id);
+		Optional<MainProfile> mainProfile = mainProfileRepo.findByEmailId(email);
 		
 		Double mainProfileLong = mainProfile.get().getLongitude();
 		Double mainProfileLat = mainProfile.get().getLattitude();
@@ -341,15 +333,17 @@ public class ClickServiceImpl implements IClickService, UserDetailsService {
 		List<Optional<BasicProfile>> listOfUsers = basicProfileRepo.findByAgeAndGender(age, gender);
 		List<BasicProfile> listOfFinalUser = new ArrayList<>();
 		
-		for (Optional<BasicProfile> currentUser : listOfUsers) {
+		for (Optional<BasicProfile> currentUserOpt : listOfUsers) {
 			
-			 Double currentUserLat = currentUser.get().getLattitude();
-			 Double currentUserLong = currentUser.get().getLongitude();
+			BasicProfile currentUser = currentUserOpt.get();
+			
+			 Double currentUserLat = currentUser.getLattitude();
+			 Double currentUserLong = currentUser.getLongitude();
 			 
 			 int distance = calculateDistance(currentUserLat, currentUserLong, mainProfileLat, mainProfileLong);
 			 
-			 if (distance<mainProfile.get().getMaximumDistance()) {
-				listOfFinalUser.add(currentUser.get());
+			 if (distance<mainProfile.get().getMaximumDistance() && !currentUser.getUserId().equals(mainProfile.get().getEmailId())) {
+				listOfFinalUser.add(currentUser);
 			}
 		}
 		

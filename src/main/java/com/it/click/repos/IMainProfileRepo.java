@@ -9,6 +9,6 @@ import com.it.click.entites.MainProfile;
 @Repository
 public interface IMainProfileRepo extends MongoRepository<MainProfile, String>{
 
-	Optional<MainProfile> findById(String id);
+	Optional<MainProfile> findByEmailId(String emailId);
 
 }
