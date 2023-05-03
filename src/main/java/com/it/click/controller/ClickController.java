@@ -1,5 +1,7 @@
 package com.it.click.controller;
 
+import java.util.ArrayList;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -9,15 +11,13 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;
-
 import com.it.click.common.JwtResponse;
 import com.it.click.common.LoginData;
+import com.it.click.entites.BasicProfile;
 import com.it.click.entites.EmailPass;
 import com.it.click.entites.MainProfile;
 import com.it.click.service.IClickService;
 
-import io.swagger.annotations.Authorization;
 
 @CrossOrigin(origins = "*", methods = { RequestMethod.POST }, allowedHeaders = "*")
 @RestController
@@ -54,6 +54,13 @@ public class ClickController {
 	public JwtResponse userLogin(@RequestBody EmailPass emailPass){
 		
 		return clickService.login(emailPass);
+	}
+	
+	@GetMapping("/getUserDashBoard")
+	public List<BasicProfile> getUsersList(@RequestHeader String token){
+		System.out.println("inside API");
+		return clickService.getUserDashBoardByIntereset(token);
+
 	}
 	
 }

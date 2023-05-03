@@ -16,7 +16,6 @@ public class MainProfile {
 
 	@Id
 	private String id;
-	private String userId;
 	private String name;
 	private Double longitude;
 	private Double lattitude;

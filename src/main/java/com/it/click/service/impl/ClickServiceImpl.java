@@ -3,7 +3,11 @@ package com.it.click.service.impl;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Currency;
 import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Optional;
 import java.util.Properties;
 import javax.mail.Authenticator;
@@ -74,11 +78,13 @@ public class ClickServiceImpl implements IClickService, UserDetailsService {
 				.lattitude(mainProfile.getLattitude()).longitude(mainProfile.getLongitude()).age(mainProfile.getAge())
 				.gender(mainProfile.getGender()).build();
 
-		SocialProfile socialProfile = SocialProfile.builder().userId(userId).name(mainProfile.getName())
+		SocialProfile socialProfile = SocialProfile.builder().userId(userId).name(mainProfile.getName()).age(mainProfile.getAge())
 				.lattitude(mainProfile.getLattitude()).longitude(mainProfile.getLongitude())
 				.gender(mainProfile.getGender()).interest(mainProfile.getInterest()).photos(mainProfile.getPhotos())
 				.build();
 
+		mainProfile.setId(userId);
+		
 		mainProfileRepo.save(mainProfile);
 
 		socialProfileRepo.save(socialProfile);
@@ -297,7 +303,7 @@ public class ClickServiceImpl implements IClickService, UserDetailsService {
 			throw new NoValueException("verifyToken", "Bad Request", "Empty token");
 
 		String[] token = bearer.split(" ");
-		
+
 		Date expirationDate;
 		try {
 			expirationDate = jwtService.extractExpiration(token[1]);
@@ -309,5 +315,62 @@ public class ClickServiceImpl implements IClickService, UserDetailsService {
 			throw new NoValueException("verifyToken", "Bad Request", "Invalid token");
 
 		return token[1];
+	}
+
+	@Override
+	public List<BasicProfile> getUserDashBoardByIntereset(String bToken) {
+		
+		String token = verifyToken(bToken);
+		
+		String email = jwtService.extractUsername(token);
+		
+		Optional<EmailPass> emailPassObj = emailPassRepo.findByEmail(email);
+		System.out.println(emailPassObj);
+		String id = emailPassObj.get().getId();
+		
+		System.out.println(id);
+
+		Optional<MainProfile> mainProfile = mainProfileRepo.findById(id);
+		
+		Double mainProfileLong = mainProfile.get().getLongitude();
+		Double mainProfileLat = mainProfile.get().getLattitude();
+		
+		int age = mainProfile.get().getAge();
+		String gender = mainProfile.get().getGender();
+		
+		List<Optional<BasicProfile>> listOfUsers = basicProfileRepo.findByAgeAndGender(age, gender);
+		List<BasicProfile> listOfFinalUser = new ArrayList<>();
+		
+		for (Optional<BasicProfile> currentUser : listOfUsers) {
+			
+			 Double currentUserLat = currentUser.get().getLattitude();
+			 Double currentUserLong = currentUser.get().getLongitude();
+			 
+			 int distance = calculateDistance(currentUserLat, currentUserLong, mainProfileLat, mainProfileLong);
+			 
+			 if (distance<mainProfile.get().getMaximumDistance()) {
+				listOfFinalUser.add(currentUser.get());
+			}
+		}
+		
+		if (listOfFinalUser!=null) {
+			return listOfFinalUser;
+		}else {
+			throw new NoValueException("getUserDashBoardByIntereset", "Bad Request", "No profile match !! nalle");
+		}
+	}
+
+	public int calculateDistance(double lat1, double lon1, double lat2, double lon2) {
+		
+		double dLat = Math.toRadians(lat2 - lat1);
+		double dLon = Math.toRadians(lon2 - lon1);
+		
+		double a = Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.cos(Math.toRadians(lat1))
+				* Math.cos(Math.toRadians(lat2)) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+		
+		double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+		int distance = (int) (6371 * c);
+		
+		return distance;
 	}
 }
