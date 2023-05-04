@@ -299,7 +299,6 @@ public class ClickServiceImpl implements IClickService, UserDetailsService {
 			throw new NoValueException("verifyToken", "Bad Request", "Empty token");
 
 		String[] token = bearer.split(" ");
-
 		Date expirationDate;
 		try {
 			expirationDate = jwtService.extractExpiration(token[1]);
@@ -308,7 +307,7 @@ public class ClickServiceImpl implements IClickService, UserDetailsService {
 		}
 
 		if (expirationDate.before(new Date()))
-			throw new NoValueException("verifyToken", "Bad Request", "Invalid token");
+			throw new NoValueException("verifyToken", "Bad Request", "token expired");
 
 		return token[1];
 	}
@@ -319,30 +318,41 @@ public class ClickServiceImpl implements IClickService, UserDetailsService {
 		String token = verifyToken(bToken);
 		
 		String email = jwtService.extractUsername(token);
-		
-		emailPassRepo.findByEmail(email);
 
 		Optional<MainProfile> mainProfile = mainProfileRepo.findByEmailId(email);
 		
-		Double mainProfileLong = mainProfile.get().getLongitude();
-		Double mainProfileLat = mainProfile.get().getLattitude();
-		
-		int age = mainProfile.get().getAge();
-		String gender = mainProfile.get().getGender();
-		
-		List<Optional<BasicProfile>> listOfUsers = basicProfileRepo.findByAgeAndGender(age, gender);
+		Double mainProfileLong;
+		Double mainProfileLat;
+
+		if (!mainProfile.isEmpty()) {
+			mainProfileLong = mainProfile.get().getLongitude();
+			mainProfileLat = mainProfile.get().getLattitude();
+		}else {
+			throw new NoValueException("getUserDashBoardByIntereset", "Bad Request", "No profile match !! nalle");
+		}
+
+		List<BasicProfile> listOfUsers = basicProfileRepo.findAll();
 		List<BasicProfile> listOfFinalUser = new ArrayList<>();
 		
-		for (Optional<BasicProfile> currentUserOpt : listOfUsers) {
+		for (BasicProfile currentUserOpt : listOfUsers) {
 			
-			BasicProfile currentUser = currentUserOpt.get();
+			BasicProfile currentUser = currentUserOpt;
 			
 			 Double currentUserLat = currentUser.getLattitude();
 			 Double currentUserLong = currentUser.getLongitude();
 			 
 			 int distance = calculateDistance(currentUserLat, currentUserLong, mainProfileLat, mainProfileLong);
 			 
-			 if (distance<mainProfile.get().getMaximumDistance() && !currentUser.getUserId().equals(mainProfile.get().getEmailId())) {
+			 System.out.println("distance between these two "+distance);
+			 System.out.println("User needed distance "+mainProfile.get().getMaximumDistance());
+			 
+			 System.out.println("User gender "+mainProfile.get().getInterestedGender());
+			 System.out.println("Current user form database "+currentUser.getGender());
+			 
+			 System.out.println();
+			 
+			 if (distance<mainProfile.get().getMaximumDistance() && !currentUser.getUserId().equals(mainProfile.get().getEmailId())
+					 && mainProfile.get().getInterestedGender().equals(currentUser.getGender())) {
 				listOfFinalUser.add(currentUser);
 			}
 		}
