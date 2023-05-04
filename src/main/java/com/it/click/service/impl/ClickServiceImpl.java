@@ -343,14 +343,6 @@ public class ClickServiceImpl implements IClickService, UserDetailsService {
 			 
 			 int distance = calculateDistance(currentUserLat, currentUserLong, mainProfileLat, mainProfileLong);
 			 
-			 System.out.println("distance between these two "+distance);
-			 System.out.println("User needed distance "+mainProfile.get().getMaximumDistance());
-			 
-			 System.out.println("User gender "+mainProfile.get().getInterestedGender());
-			 System.out.println("Current user form database "+currentUser.getGender());
-			 
-			 System.out.println();
-			 
 			 if (distance<mainProfile.get().getMaximumDistance() && !currentUser.getUserId().equals(mainProfile.get().getEmailId())
 					 && mainProfile.get().getInterestedGender().equals(currentUser.getGender())) {
 				listOfFinalUser.add(currentUser);
