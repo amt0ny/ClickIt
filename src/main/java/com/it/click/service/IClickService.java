@@ -6,6 +6,7 @@ import com.it.click.common.LoginData;
 import com.it.click.entites.BasicProfile;
 import com.it.click.entites.EmailPass;
 import com.it.click.entites.MainProfile;
+import com.it.click.responses.BasicProfileResponse;
 
 
 public interface IClickService{
@@ -18,6 +19,6 @@ public interface IClickService{
 
 	String generateAndSendEmailOtp(EmailPass emailPass);
 
-	List<BasicProfile> getUserDashBoardByIntereset(String token);
+	List<BasicProfileResponse> getUserDashBoardByIntereset(String token);
 
 }

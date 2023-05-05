@@ -15,7 +15,9 @@ import com.it.click.common.LoginData;
 import com.it.click.entites.BasicProfile;
 import com.it.click.entites.EmailPass;
 import com.it.click.entites.MainProfile;
+import com.it.click.responses.BasicProfileResponse;
 import com.it.click.service.IClickService;
+
 
 
 @CrossOrigin(origins = "*", methods = { RequestMethod.POST, RequestMethod.GET }, allowedHeaders = "*")
@@ -56,7 +58,7 @@ public class ClickController {
 	}
 	
 	@GetMapping("/getUserDashBoard")
-	public List<BasicProfile> getUsersList(@RequestHeader String token){
+	public List<BasicProfileResponse> getUsersList(@RequestHeader String token){
 
 		return clickService.getUserDashBoardByIntereset(token);
 

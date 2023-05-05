@@ -39,6 +39,7 @@ import com.it.click.repos.IBasicProfileRepo;
 import com.it.click.repos.IEmailPassRepo;
 import com.it.click.repos.IMainProfileRepo;
 import com.it.click.repos.ISocialProfileRepo;
+import com.it.click.responses.BasicProfileResponse;
 import com.it.click.service.IClickService;
 import com.it.click.service.helper.JwtService;
 
@@ -295,7 +296,7 @@ public class ClickServiceImpl implements IClickService, UserDetailsService {
 
 	private String verifyToken(String bearer) {
 
-		if (bearer.isEmpty())
+		if (bearer.isEmpty() || bearer == null)
 			throw new NoValueException("verifyToken", "Bad Request", "Empty token");
 
 		String[] token = bearer.split(" ");
@@ -311,9 +312,10 @@ public class ClickServiceImpl implements IClickService, UserDetailsService {
 
 		return token[1];
 	}
+	
 
 	@Override
-	public List<BasicProfile> getUserDashBoardByIntereset(String bToken) {
+	public List<BasicProfileResponse> getUserDashBoardByIntereset(String bToken) {
 		
 		String token = verifyToken(bToken);
 		
@@ -332,7 +334,7 @@ public class ClickServiceImpl implements IClickService, UserDetailsService {
 		}
 
 		List<BasicProfile> listOfUsers = basicProfileRepo.findAll();
-		List<BasicProfile> listOfFinalUser = new ArrayList<>();
+		List<BasicProfileResponse> listOfFinalUser = new ArrayList<>();
 		
 		for (BasicProfile currentUserOpt : listOfUsers) {
 			
@@ -345,7 +347,14 @@ public class ClickServiceImpl implements IClickService, UserDetailsService {
 			 
 			 if (distance<mainProfile.get().getMaximumDistance() && !currentUser.getUserId().equals(mainProfile.get().getEmailId())
 					 && mainProfile.get().getInterestedGender().equals(currentUser.getGender())) {
-				listOfFinalUser.add(currentUser);
+				 BasicProfileResponse currentUserResponse = BasicProfileResponse.builder()
+						 .age(currentUser.getAge())
+						 .distance(distance)
+						 .name(currentUser.getName())
+						 .gender(currentUser.getGender())
+						 .photo(currentUser.getPhoto())
+						 .build();
+				listOfFinalUser.add(currentUserResponse);
 			}
 		}
 		
