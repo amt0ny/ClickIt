@@ -73,10 +73,15 @@ public class ClickServiceImpl implements IClickService, UserDetailsService {
 		String token = verifyToken(bToken);
 
 		String emailId = jwtService.extractUsername(token);
+		
+		if (!mainProfileRepo.findByEmailId(emailId).isEmpty()) {
+			throw new NoValueException("signUp", "Bad Request", "User already exists in main profile, please delete account first");
+		}
 
 		BasicProfile basicProfile = BasicProfile.builder().userId(emailId).name(mainProfile.getName())
-				.lattitude(mainProfile.getLattitude()).longitude(mainProfile.getLongitude()).age(mainProfile.getAge())
-				.gender(mainProfile.getGender()).build();
+				.photo(mainProfile.getProfilePhoto()).lattitude(mainProfile.getLattitude())
+				.longitude(mainProfile.getLongitude()).age(mainProfile.getAge()).gender(mainProfile.getGender())
+				.build();
 
 		SocialProfile socialProfile = SocialProfile.builder().userId(emailId).name(mainProfile.getName())
 				.lattitude(mainProfile.getLattitude()).longitude(mainProfile.getLongitude())
@@ -347,7 +352,7 @@ public class ClickServiceImpl implements IClickService, UserDetailsService {
 
 			int distance = calculateDistance(currentUserLat, currentUserLong, mainProfileLat, mainProfileLong);
 
-			if (distance < mainProfile.get().getMaximumDistance() && distance > mainProfile.get().getMinAgeRange() 
+			if (distance < mainProfile.get().getMaximumDistance() && distance > mainProfile.get().getMinAgeRange()
 					&& !currentUser.getUserId().equals(mainProfile.get().getEmailId())
 					&& mainProfile.get().getInterestedGender().equals(currentUser.getGender())) {
 				BasicProfileResponse currentUserResponse = BasicProfileResponse.builder().age(currentUser.getAge())
