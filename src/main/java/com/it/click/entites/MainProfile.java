@@ -23,6 +23,7 @@ public class MainProfile {
 	private String gender;
 	private List<Photo> photos;
 	private String profilePhoto;
+	private int minAgeRange;
 	private int maxAgeRange;
 	private int maximumDistance;
 	private String interestedGender;

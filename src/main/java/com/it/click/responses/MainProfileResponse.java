@@ -20,6 +20,7 @@ public class MainProfileResponse {
 	private String interestedGender;
 	private List<Photo> photos;
 	private String profilePhoto;
+	private int minAgeRange;
 	private int maxAgeRange;
 	private int maximumDistance;
 	private List<String> interests;

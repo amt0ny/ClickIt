@@ -82,7 +82,7 @@ public class ClickServiceImpl implements IClickService, UserDetailsService {
 				.lattitude(mainProfile.getLattitude()).longitude(mainProfile.getLongitude())
 				.gender(mainProfile.getGender()).interest(mainProfile.getInterest()).photos(mainProfile.getPhotos())
 				.build();
-		
+
 		mainProfile.setEmailId(emailId);
 
 		mainProfileRepo.save(mainProfile);
@@ -315,101 +315,91 @@ public class ClickServiceImpl implements IClickService, UserDetailsService {
 
 		return token[1];
 	}
-	
 
 	@Override
 	public List<BasicProfileResponse> getUserDashBoardByIntereset(String bToken) {
-		
+
 		String token = verifyToken(bToken);
-		
+
 		String email = jwtService.extractUsername(token);
 
 		Optional<MainProfile> mainProfile = mainProfileRepo.findByEmailId(email);
-		
+
 		Double mainProfileLong;
 		Double mainProfileLat;
 
 		if (!mainProfile.isEmpty()) {
 			mainProfileLong = mainProfile.get().getLongitude();
 			mainProfileLat = mainProfile.get().getLattitude();
-		}else {
+		} else {
 			throw new NoValueException("getUserDashBoardByIntereset", "Bad Request", "No profile match !! nalle");
 		}
 
 		List<BasicProfile> listOfUsers = basicProfileRepo.findAll();
 		List<BasicProfileResponse> listOfFinalUser = new ArrayList<>();
-		
+
 		for (BasicProfile currentUserOpt : listOfUsers) {
-			
+
 			BasicProfile currentUser = currentUserOpt;
-			
-			 Double currentUserLat = currentUser.getLattitude();
-			 Double currentUserLong = currentUser.getLongitude();
-			 
-			 int distance = calculateDistance(currentUserLat, currentUserLong, mainProfileLat, mainProfileLong);
-			 
-			 if (distance<mainProfile.get().getMaximumDistance() && !currentUser.getUserId().equals(mainProfile.get().getEmailId())
-					 && mainProfile.get().getInterestedGender().equals(currentUser.getGender())) {
-				 BasicProfileResponse currentUserResponse = BasicProfileResponse.builder()
-						 .age(currentUser.getAge())
-						 .distance(distance)
-						 .name(currentUser.getName())
-						 .gender(currentUser.getGender())
-						 .photo(currentUser.getPhoto())
-						 .build();
+
+			Double currentUserLat = currentUser.getLattitude();
+			Double currentUserLong = currentUser.getLongitude();
+
+			int distance = calculateDistance(currentUserLat, currentUserLong, mainProfileLat, mainProfileLong);
+
+			if (distance < mainProfile.get().getMaximumDistance() && distance > mainProfile.get().getMinAgeRange() 
+					&& !currentUser.getUserId().equals(mainProfile.get().getEmailId())
+					&& mainProfile.get().getInterestedGender().equals(currentUser.getGender())) {
+				BasicProfileResponse currentUserResponse = BasicProfileResponse.builder().age(currentUser.getAge())
+						.distance(distance).name(currentUser.getName()).gender(currentUser.getGender())
+						.photo(currentUser.getPhoto()).build();
 				listOfFinalUser.add(currentUserResponse);
 			}
 		}
-		
+
 		if (!listOfFinalUser.isEmpty()) {
 			return listOfFinalUser;
-		}else {
+		} else {
 			throw new NoValueException("getUserDashBoardByIntereset", "Bad Request", "No profile match !! nalle");
 		}
 	}
 
 	public int calculateDistance(double lat1, double lon1, double lat2, double lon2) {
-		
+
 		double dLat = Math.toRadians(lat2 - lat1);
 		double dLon = Math.toRadians(lon2 - lon1);
-		
+
 		double a = Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.cos(Math.toRadians(lat1))
 				* Math.cos(Math.toRadians(lat2)) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
-		
+
 		double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 		int distance = (int) (6371 * c);
-		
+
 		return distance;
 	}
 
 	@Override
 	public MainProfileResponse getUserProfile(String btoken) {
-		
+
 		String token = verifyToken(btoken);
-		
+
 		String email = jwtService.extractUsername(token);
-		
+
 		Optional<MainProfile> mainProfileOpt = mainProfileRepo.findByEmailId(email);
 		if (mainProfileOpt.isEmpty()) {
-			throw new NoValueException("getUserProfile", "Bad Request", "Seems like you've log out or token is expired");
+			throw new NoValueException("getUserProfile", "Bad Request",
+					"Seems like you've log out or token is expired");
 		}
-		
+
 		MainProfile mainProfile = mainProfileOpt.get();
-		
-		MainProfileResponse mainProfileResponse = MainProfileResponse.builder()
-				
-				.emailId(mainProfile.getEmailId())
-				.name(mainProfile.getName())
-				.age(mainProfile.getAge())
-				.maxAgeRange(mainProfile.getMaxAgeRange())
-				.gender(mainProfile.getGender())
-				.interestedGender(mainProfile.getInterestedGender())
-				.profilePhoto(mainProfile.getProfilePhoto())
-				.interests(mainProfile.getInterest())
-				.maximumDistance(mainProfile.getMaximumDistance())
-				.build();
-		
+
+		MainProfileResponse mainProfileResponse = MainProfileResponse.builder().emailId(mainProfile.getEmailId())
+				.name(mainProfile.getName()).age(mainProfile.getAge()).maxAgeRange(mainProfile.getMaxAgeRange())
+				.minAgeRange(mainProfile.getMinAgeRange()).gender(mainProfile.getGender())
+				.interestedGender(mainProfile.getInterestedGender()).profilePhoto(mainProfile.getProfilePhoto())
+				.interests(mainProfile.getInterest()).maximumDistance(mainProfile.getMaximumDistance()).build();
+
 		return mainProfileResponse;
-				
+
 	}
 }
