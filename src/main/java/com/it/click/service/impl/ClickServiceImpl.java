@@ -17,6 +17,8 @@ import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
+
+import org.hibernate.hql.spi.id.cte.AbstractCteValuesListBulkIdHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -40,6 +42,7 @@ import com.it.click.repos.IEmailPassRepo;
 import com.it.click.repos.IMainProfileRepo;
 import com.it.click.repos.ISocialProfileRepo;
 import com.it.click.responses.BasicProfileResponse;
+import com.it.click.responses.MainProfileResponse;
 import com.it.click.service.IClickService;
 import com.it.click.service.helper.JwtService;
 
@@ -358,7 +361,7 @@ public class ClickServiceImpl implements IClickService, UserDetailsService {
 			}
 		}
 		
-		if (listOfFinalUser!=null) {
+		if (!listOfFinalUser.isEmpty()) {
 			return listOfFinalUser;
 		}else {
 			throw new NoValueException("getUserDashBoardByIntereset", "Bad Request", "No profile match !! nalle");
@@ -377,5 +380,36 @@ public class ClickServiceImpl implements IClickService, UserDetailsService {
 		int distance = (int) (6371 * c);
 		
 		return distance;
+	}
+
+	@Override
+	public MainProfileResponse getUserProfile(String btoken) {
+		
+		String token = verifyToken(btoken);
+		
+		String email = jwtService.extractUsername(token);
+		
+		Optional<MainProfile> mainProfileOpt = mainProfileRepo.findByEmailId(email);
+		if (mainProfileOpt.isEmpty()) {
+			throw new NoValueException("getUserProfile", "Bad Request", "Seems like you've log out or token is expired");
+		}
+		
+		MainProfile mainProfile = mainProfileOpt.get();
+		
+		MainProfileResponse mainProfileResponse = MainProfileResponse.builder()
+				
+				.emailId(mainProfile.getEmailId())
+				.name(mainProfile.getName())
+				.age(mainProfile.getAge())
+				.maxAgeRange(mainProfile.getMaxAgeRange())
+				.gender(mainProfile.getGender())
+				.interestedGender(mainProfile.getInterestedGender())
+				.profilePhoto(mainProfile.getProfilePhoto())
+				.interests(mainProfile.getInterest())
+				.maximumDistance(mainProfile.getMaximumDistance())
+				.build();
+		
+		return mainProfileResponse;
+				
 	}
 }

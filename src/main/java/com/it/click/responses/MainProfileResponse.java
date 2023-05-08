@@ -1,31 +1,27 @@
-package com.it.click.entites;
+package com.it.click.responses;
 
 import java.util.List;
-import javax.persistence.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
 import com.it.click.common.Photo;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Document(collection = "MainProfile")
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 @Data
-public class MainProfile {
-
-	@Id
+public class MainProfileResponse {
+	
 	private String emailId;
 	private String name;
-	private Double longitude;
-	private Double lattitude;
 	private int age;
 	private String gender;
+	private String interestedGender;
 	private List<Photo> photos;
 	private String profilePhoto;
 	private int maxAgeRange;
 	private int maximumDistance;
-	private String interestedGender;
-	private List<String> interest;
- 
+	private List<String> interests;
+	
 }

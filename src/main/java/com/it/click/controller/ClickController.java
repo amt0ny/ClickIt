@@ -12,10 +12,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import com.it.click.common.JwtResponse;
 import com.it.click.common.LoginData;
-import com.it.click.entites.BasicProfile;
 import com.it.click.entites.EmailPass;
 import com.it.click.entites.MainProfile;
 import com.it.click.responses.BasicProfileResponse;
+import com.it.click.responses.MainProfileResponse;
 import com.it.click.service.IClickService;
 
 
@@ -57,11 +57,16 @@ public class ClickController {
 		return clickService.login(emailPass);
 	}
 	
-	@GetMapping("/getUserDashBoard")
+	@GetMapping("/getUserDashBoardByToken")
 	public List<BasicProfileResponse> getUsersList(@RequestHeader String token){
 
 		return clickService.getUserDashBoardByIntereset(token);
-
+	}
+	
+	@GetMapping("/getUserProfileByToken")
+	public MainProfileResponse getUserProfile(@RequestHeader String token) {
+		
+		return clickService.getUserProfile(token);
 	}
 	
 }
