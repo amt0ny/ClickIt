@@ -351,10 +351,21 @@ public class ClickServiceImpl implements IClickService, UserDetailsService {
 			Double currentUserLong = currentUser.getLongitude();
 
 			int distance = calculateDistance(currentUserLat, currentUserLong, mainProfileLat, mainProfileLong);
+			
+			System.out.println("Current user gender "+currentUser.getGender());
+			System.out.println("Current user age "+currentUser.getAge());
+			System.out.println("Main user Min age "+mainProfile.get().getMinAgeRange());
+			System.out.println("Main user Max age "+mainProfile.get().getMaxAgeRange());
+			System.out.println("Max Distance "+ mainProfile.get().getMaximumDistance());
+			System.out.println("Distance after comparision "+ distance);
+			System.out.println("Name of currunt user "+currentUser.getName());
+			System.out.println();
 
-			if (distance < mainProfile.get().getMaximumDistance() && distance > mainProfile.get().getMinAgeRange()
+			if (distance < mainProfile.get().getMaximumDistance() && currentUser.getAge() > mainProfile.get().getMinAgeRange()
+					&& currentUser.getAge() < mainProfile.get().getMaxAgeRange()
 					&& !currentUser.getUserId().equals(mainProfile.get().getEmailId())
 					&& mainProfile.get().getInterestedGender().equals(currentUser.getGender())) {
+				
 				BasicProfileResponse currentUserResponse = BasicProfileResponse.builder().age(currentUser.getAge())
 						.distance(distance).name(currentUser.getName()).gender(currentUser.getGender())
 						.photo(currentUser.getPhoto()).build();
