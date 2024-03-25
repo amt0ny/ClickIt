@@ -1,8 +1,12 @@
 package com.it.click.config;
 
+import com.it.click.entities.RegisterData;
+import com.it.click.repo.IRegisterDataRepo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -16,9 +20,10 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import com.it.click.service.impl.ClickServiceImpl;
 
-@SuppressWarnings("deprecation")
 @Configuration
 @EnableWebSecurity
+@EntityScan(basePackageClasses = RegisterData.class)
+@EnableJpaRepositories(basePackageClasses = IRegisterDataRepo.class)
 public class ClickConfiguration extends WebSecurityConfigurerAdapter {
 
 	@Autowired
@@ -27,9 +32,8 @@ public class ClickConfiguration extends WebSecurityConfigurerAdapter {
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
 
-		http.csrf().disable().authorizeRequests().antMatchers("/login", "/sendOtp","/varifyOtp","/signUp","/getUserDashBoardByToken","/getUserProfileByToken").permitAll().anyRequest()
+		http.csrf().disable().authorizeRequests().antMatchers("/login", "/sendOtp","/varifyEmailByOtp","/registerUser","/getUserDashBoardByToken","/updateProfile").permitAll().anyRequest()
 				.authenticated().and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-
 	}
 
 	@Override
@@ -54,7 +58,6 @@ public class ClickConfiguration extends WebSecurityConfigurerAdapter {
 
 		return authenticationProvider;
 	}
-
 	@Bean
 	public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
 

@@ -1,26 +1,21 @@
 package com.it.click.service;
 
-import java.util.List;
 import com.it.click.common.JwtResponse;
 import com.it.click.common.LoginData;
-import com.it.click.entites.EmailPass;
-import com.it.click.entites.MainProfile;
-import com.it.click.responses.BasicProfileResponse;
+import com.it.click.entities.RegisterData;
+import com.it.click.entities.UserMaster;
 import com.it.click.responses.MainProfileResponse;
 
 
 public interface IClickService{
 
-	String signUp(MainProfile mainProfile, String token);
+	String signUp(RegisterData mainProfile);
 
-	JwtResponse login(EmailPass emailPass);
+	JwtResponse login(LoginData loginData);
 
-	JwtResponse otpVarification(LoginData loginData);
-
-	String generateAndSendEmailOtp(EmailPass emailPass);
-
-	List<BasicProfileResponse> getUserDashBoardByIntereset(String token);
+	UserMaster getUserDashBoardByRole(String bToken);
 
 	MainProfileResponse getUserProfile(String token);
 
+	String updateProfile(UserMaster userMasterData, String token);
 }
