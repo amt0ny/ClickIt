@@ -1,7 +1,5 @@
 package com.it.click.service.impl;
 
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.time.LocalDate;
 import java.util.*;
 import com.it.click.entities.RegisterData;
@@ -21,7 +19,6 @@ import org.springframework.stereotype.Service;
 import com.it.click.common.JwtResponse;
 import com.it.click.common.LoginData;
 import com.it.click.exception.NoValueException;
-import com.it.click.responses.BasicProfileResponse;
 import com.it.click.responses.MainProfileResponse;
 import com.it.click.service.IClickService;
 import com.it.click.service.helper.JwtService;
@@ -161,7 +158,7 @@ public class ClickServiceImpl implements IClickService, UserDetailsService {
 		}
 
 		RegisterData registerData = mainProfileOpt.get();
-        return MainProfileResponse.builder()
+		return MainProfileResponse.builder()
 				.emailId(registerData.getEmail())
 				.name(registerData.getName())
 				.build();
