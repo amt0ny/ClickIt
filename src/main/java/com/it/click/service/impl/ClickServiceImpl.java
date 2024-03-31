@@ -168,11 +168,21 @@ public class ClickServiceImpl implements IClickService, UserDetailsService {
 	public String updateProfile(UserMaster userMasterData, String btoken) {
 		String token = verifyToken(btoken);
 		String email = jwtService.extractUsername(token);
-		if (!userMasterRepo.findByEmail(email).isEmpty()){
+		UserMaster dbuser;
+
+		if (userMasterRepo.findByEmail(email).isEmpty()){
 			throw new NoValueException("updateProfile", "Bad Request",
-					"Something went wrong");
+					"User email does not exists in table 'UserMaster'");
+		}else {
+			 dbuser = userMasterRepo.findByEmail(email).get();
 		}
 		UserMaster userMaster = new UserMaster();
+		userMaster.setId(dbuser.getId());
+		userMaster.setEmail(dbuser.getEmail());
+		userMaster.setJoinedOn(dbuser.getJoinedOn());
+		userMaster.setName(dbuser.getName());
+		userMaster.setStatus(dbuser.getStatus());
+
 		userMaster.setDepartment(userMasterData.getDepartment());
 		userMaster.setDob(userMasterData.getDob());
 		userMaster.setDesignation(userMasterData.getDesignation());
@@ -181,7 +191,7 @@ public class ClickServiceImpl implements IClickService, UserDetailsService {
 		userMaster.setPhoto(userMasterData.getPhoto());
 		userMaster.setMobileNumber(userMasterData.getMobileNumber());
 
-		userMasterRepo.save(userMasterData);
+		userMasterRepo.save(userMaster);
 		return "Details updated";
 	}
 }
