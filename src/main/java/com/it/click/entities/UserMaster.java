@@ -24,6 +24,7 @@ public class UserMaster {
     private String status;
     private LocalDate joinedOn;
     private String designation;
+    private String role;
     private String manager;
     private String department;
 

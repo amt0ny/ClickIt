@@ -2,10 +2,13 @@ package com.it.click.service.impl;
 
 import java.time.LocalDate;
 import java.util.*;
+import com.it.click.common.UserProfileResponse;
 import com.it.click.entities.RegisterData;
+import com.it.click.entities.TaskMaster;
 import com.it.click.entities.UserMaster;
 import com.it.click.repo.IRegisterDataRepo;
 import com.it.click.repo.IUserMasterRepo;
+import com.it.click.repo.TaskMasterRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -19,7 +22,6 @@ import org.springframework.stereotype.Service;
 import com.it.click.common.JwtResponse;
 import com.it.click.common.LoginData;
 import com.it.click.exception.NoValueException;
-import com.it.click.responses.MainProfileResponse;
 import com.it.click.service.IClickService;
 import com.it.click.service.helper.JwtService;
 
@@ -34,6 +36,8 @@ public class ClickServiceImpl implements IClickService, UserDetailsService {
 	private AuthenticationManager authenticationManager;
 	@Autowired
 	private JwtService jwtService;
+	@Autowired
+	private TaskMasterRepo taskMasterRepo;
 
 	@Override
 	public String signUp(RegisterData registerData) {
@@ -47,6 +51,8 @@ public class ClickServiceImpl implements IClickService, UserDetailsService {
 		registerDataRepo.save(registerData);
 
 		UserMaster userMaster = new UserMaster();
+		userMaster.setName(registerData.getName());
+		userMaster.setDesignation(registerData.getUserType());
 		userMaster.setEmail(registerData.getEmail());
 		userMaster.setId(id);
 		userMaster.setStatus("ACTIVE");
@@ -64,15 +70,12 @@ public class ClickServiceImpl implements IClickService, UserDetailsService {
 
 	@Override
 	public JwtResponse login(LoginData loginData) {
-
 		if (!registerDataRepo.existsByEmail(loginData.getEmail())) {
 			throw new NoValueException("login", "Bad Request",
 					"Email not registered with us, please create an account");
 		}
-
 		String pass = registerDataRepo.findByEmail(loginData.getEmail()).get().getPassword();
 		String rowPass = loginData.getPassword();
-
 		if (passwordEncoder().matches(rowPass, pass)) {
 			JwtResponse token;
 			token = generateTokenByEmailAndPassword(loginData.getEmail(), loginData.getPassword());
@@ -84,9 +87,7 @@ public class ClickServiceImpl implements IClickService, UserDetailsService {
 
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-
 		Optional<RegisterData> optional = registerDataRepo.findByEmail(username);
-
 		if (optional.isPresent()) {
 			return optional.get();
 		} else {
@@ -95,30 +96,20 @@ public class ClickServiceImpl implements IClickService, UserDetailsService {
 	}
 
 	public JwtResponse generateTokenByEmailAndPassword(String email, String password) {
-
 		try {
-
 			this.authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(email, password));
-
 		} catch (Exception e) {
 			e.printStackTrace();
-
 			throw new NoValueException("loadUserByUsername", "Bad Request", "User does not exists");
 		}
-
 		UserDetails userDetails = loadUserByUsername(email);
-
 		String token = jwtService.generateToken(userDetails);
-
 		return new JwtResponse(token);
-
 	}
 
 	private String verifyToken(String bearer) {
-
 		if (bearer.isEmpty() || bearer == null)
 			throw new NoValueException("verifyToken", "Bad Request", "Empty token");
-
 		String[] token = bearer.split(" ");
 		Date expirationDate;
 		try {
@@ -126,19 +117,15 @@ public class ClickServiceImpl implements IClickService, UserDetailsService {
 		} catch (Exception e) {
 			throw new NoValueException("verifyToken", "Bad Request", "Invalid token");
 		}
-
 		if (expirationDate.before(new Date()))
 			throw new NoValueException("verifyToken", "Bad Request", "token expired");
-
 		return token[1];
 	}
 
 	@Override
 	public UserMaster getUserDashBoardByRole(String bToken) {
-
 		String token = verifyToken(bToken);
 		String email = jwtService.extractUsername(token);
-
 		if (userMasterRepo.findByEmail(email).isEmpty()){
 			throw new NoValueException("getUserDashBoardByRole", "Bad Request",
 					"Unable to fetch user data");
@@ -147,21 +134,25 @@ public class ClickServiceImpl implements IClickService, UserDetailsService {
 	}
 
 	@Override
-	public MainProfileResponse getUserProfile(String btoken) {
+	public UserProfileResponse getUserProfile(String btoken, String employeeEmail) {
 		String token = verifyToken(btoken);
 		String email = jwtService.extractUsername(token);
-
-		Optional<RegisterData> mainProfileOpt = registerDataRepo.findByEmail(email);
-		if (mainProfileOpt.isEmpty()) {
+		Optional<UserMaster> userMaster = userMasterRepo.findByEmail(email);
+		if (userMaster.isEmpty()) {
 			throw new NoValueException("getUserProfile", "Bad Request",
-					"Seems like you've log out or token is expired");
+					"Seems like you've logged out or token is expired");
 		}
+		UserProfileResponse userProfileResponse = new UserProfileResponse();
+		if (!email.equals(employeeEmail)){
+			UserMaster employeeData =  userMasterRepo.findByEmail(employeeEmail).get();
+			userProfileResponse.setRole(employeeData.getRole());
+			userProfileResponse.setName(employeeData.getName());
+			userProfileResponse.setContactNo(employeeData.getMobileNumber());
+			userProfileResponse.setDesignation(employeeData.getDesignation());
+			userProfileResponse.setEmail(employeeData.getEmail());
 
-		RegisterData registerData = mainProfileOpt.get();
-		return MainProfileResponse.builder()
-				.emailId(registerData.getEmail())
-				.name(registerData.getName())
-				.build();
+		}
+		return userProfileResponse;
 	}
 
 	@Override
@@ -182,16 +173,85 @@ public class ClickServiceImpl implements IClickService, UserDetailsService {
 		userMaster.setJoinedOn(dbuser.getJoinedOn());
 		userMaster.setName(dbuser.getName());
 		userMaster.setStatus(dbuser.getStatus());
+		userMaster.setDesignation(dbuser.getDesignation());
 
 		userMaster.setDepartment(userMasterData.getDepartment());
 		userMaster.setDob(userMasterData.getDob());
-		userMaster.setDesignation(userMasterData.getDesignation());
 		userMaster.setFatherName(userMasterData.getFatherName());
 		userMaster.setManager(userMasterData.getManager());
 		userMaster.setPhoto(userMasterData.getPhoto());
 		userMaster.setMobileNumber(userMasterData.getMobileNumber());
-
 		userMasterRepo.save(userMaster);
 		return "Details updated";
 	}
+
+	@Override
+	public String addSelfTask(String token, TaskMaster taskMasterData) {
+		String tokenString = verifyToken(token);
+		String email = jwtService.extractUsername(tokenString);
+		TaskMaster taskMaster =  new TaskMaster();
+		taskMaster.setTaskStatus("ACTIVE");
+		taskMaster.setOwner(email);
+		taskMaster.setTaskDescription(taskMasterData.getTaskDescription());
+		taskMaster.setTaskType(taskMasterData.getTaskType());
+		taskMaster.setTask(taskMasterData.getTask());
+		taskMaster.setPriority(taskMasterData.getPriority());
+		taskMaster.setAssignedBy("Self");
+		taskMasterRepo.save(taskMaster);
+		return "Self Task Added";
+	}
+
+	@Override
+	public String assignTaskToJunior(String token, TaskMaster taskMasterData) {
+		String tokenString = verifyToken(token);
+		String email = jwtService.extractUsername(tokenString);
+		TaskMaster taskMaster =  new TaskMaster();
+		taskMaster.setTaskStatus("ACTIVE");
+		taskMaster.setOwner(taskMasterData.getOwner());
+		taskMaster.setTaskDescription(taskMasterData.getTaskDescription());
+		taskMaster.setTaskType(taskMasterData.getTaskType());
+		taskMaster.setTask(taskMasterData.getTask());
+		taskMaster.setPriority(taskMasterData.getPriority());
+		taskMaster.setAssignedBy(email);
+
+		return "Task Assigned to User : "+ taskMasterData.getOwner();
+	}
+
+	@Override
+	public List<UserProfileResponse> getTeamListByToken(String token) {
+		String tokenString = verifyToken(token);
+		String email = jwtService.extractUsername(tokenString);
+		List<UserMaster> userMasterList = userMasterRepo.findByManager(email);
+		List<UserProfileResponse> userProfileResponseList = new ArrayList<>();
+		for (UserMaster userMasterDate: userMasterList) {
+			UserProfileResponse userProfileResponse = new UserProfileResponse();
+			userProfileResponse.setEmail(userMasterDate.getEmail());
+			userProfileResponse.setRole(userMasterDate.getRole());
+			userProfileResponse.setName(userMasterDate.getName());
+			userProfileResponse.setContactNo(userMasterDate.getMobileNumber());
+			userProfileResponse.setDesignation(userMasterDate.getDesignation());
+			userProfileResponseList.add(userProfileResponse);
+		}
+		return  userProfileResponseList;
+	}
+
+	@Override
+	public UserMaster getDeveloperProfile(String token, String developerEmail) {
+		verifyToken(token);
+		if (userMasterRepo.findByEmail(developerEmail).isPresent()){
+			return userMasterRepo.findByEmail(developerEmail).get();
+		}else {
+			throw new NoValueException("getDeveloperProfile", "Bad Request",
+					"No user with email '" + developerEmail + "'");
+		}
+	}
+
+	@Override
+	public List<TaskMaster> getSelfTasksByToken(String token) {
+		String tokenString = verifyToken(token);
+		String email = jwtService.extractUsername(tokenString);
+        return taskMasterRepo.findAllByOwner(email);
+	}
+
+
 }

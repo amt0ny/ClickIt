@@ -4,7 +4,9 @@ import java.time.LocalDate;
 import java.util.List;
 
 import com.it.click.common.LoginData;
+import com.it.click.common.UserProfileResponse;
 import com.it.click.entities.RegisterData;
+import com.it.click.entities.TaskMaster;
 import com.it.click.entities.UserMaster;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -47,10 +49,33 @@ public class ClickController {
 		return clickService.getUserDashBoardByRole(token);
 	}
 	
-//	@GetMapping("/getUserProfileByToken")
-//	public MainProfileResponse getUserProfile(@RequestHeader String token) {
-//
-//		return clickService.getUserProfile(token);
-//	}
-	
+	@GetMapping("/getUserProfileByEmail")
+	public UserProfileResponse getUserProfile(@RequestHeader String token, @RequestHeader String email) {
+		return clickService.getUserProfile(token, email);
+	}
+
+	@PostMapping("/addSelfTask")
+	public String addSelfTask(@RequestHeader String token, @RequestBody TaskMaster taskData) {
+		return clickService.addSelfTask(token, taskData);
+	}
+
+	@PostMapping("/addTaskToKJunior")
+	public String addTaskToJunior(@RequestHeader String token, @RequestBody TaskMaster taskData) {
+		return clickService.assignTaskToJunior(token, taskData);
+	}
+
+	@GetMapping("/getTeamByToken")
+	public List<UserProfileResponse> getTeamByToken(@RequestHeader String token) {
+		return clickService.getTeamListByToken(token);
+	}
+
+	@GetMapping("/getDeveloperProfile")
+	public UserMaster getDeveloperProfile(@RequestHeader String token, @RequestHeader String developerEmail) {
+		return clickService.getDeveloperProfile(token, developerEmail);
+	}
+
+	@GetMapping("/getSelfTasksByToken")
+	public List<TaskMaster> getSelfTasksByToken(@RequestHeader String token) {
+		return clickService.getSelfTasksByToken(token);
+	}
 }
