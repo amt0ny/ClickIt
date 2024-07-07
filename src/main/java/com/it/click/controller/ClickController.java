@@ -1,8 +1,6 @@
 package com.it.click.controller;
 
-import java.time.LocalDate;
 import java.util.List;
-
 import com.it.click.common.LoginData;
 import com.it.click.common.UserProfileResponse;
 import com.it.click.entities.RegisterData;
@@ -18,7 +16,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import com.it.click.common.JwtResponse;
-import com.it.click.responses.BasicProfileResponse;
 import com.it.click.service.IClickService;
 
 @CrossOrigin(origins = "*", methods = { RequestMethod.POST, RequestMethod.GET }, allowedHeaders = "*")
@@ -39,9 +36,9 @@ public class ClickController {
 		return clickService.login(loginData);
 	}
 
-	@PostMapping("/updateProfile")
-	public String completeProfile(@RequestBody UserMaster userMasterData, @RequestHeader String token){
-		return clickService.updateProfile(userMasterData, token);
+	@PostMapping("/updateOwnProfile")
+	public UserMaster updateOwnProfile(@RequestBody UserMaster userMasterData, @RequestHeader String token){
+		return clickService.updateOwnProfile(userMasterData, token);
 	}
 	
 	@GetMapping("/getUserDashBoardByToken")
@@ -78,4 +75,15 @@ public class ClickController {
 	public List<TaskMaster> getSelfTasksByToken(@RequestHeader String token) {
 		return clickService.getSelfTasksByToken(token);
 	}
+
+	@PostMapping("/updateTask")
+	public String updateDeveloperTask(@RequestHeader String token, @RequestBody TaskMaster taskData) {
+		return clickService.updateTask(token, taskData);
+	}
+
+	@PostMapping("/updateDeveloperTask")
+	public String updateDeveloperTask(@RequestHeader String token, @RequestBody TaskMaster taskData, @RequestHeader String developerEmail) {
+		return clickService.updateDeveloperTask(token, taskData, developerEmail);
+	}
+
 }

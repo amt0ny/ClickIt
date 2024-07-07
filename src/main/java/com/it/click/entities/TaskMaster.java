@@ -3,7 +3,6 @@ package com.it.click.entities;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -16,7 +15,8 @@ public class TaskMaster {
 
     @Id
     @GeneratedValue
-    private int id;
+    private String id;
+    private String email;
     private String taskType;
     private String task;
     private String taskDescription;

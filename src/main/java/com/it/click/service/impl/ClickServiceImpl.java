@@ -64,7 +64,6 @@ public class ClickServiceImpl implements IClickService, UserDetailsService {
 
 	@Bean
 	public PasswordEncoder passwordEncoder() {
-
 		return new BCryptPasswordEncoder();
 	}
 
@@ -156,7 +155,7 @@ public class ClickServiceImpl implements IClickService, UserDetailsService {
 	}
 
 	@Override
-	public String updateProfile(UserMaster userMasterData, String btoken) {
+	public UserMaster updateOwnProfile(UserMaster userMasterData, String btoken) {
 		String token = verifyToken(btoken);
 		String email = jwtService.extractUsername(token);
 		UserMaster dbuser;
@@ -169,20 +168,14 @@ public class ClickServiceImpl implements IClickService, UserDetailsService {
 		}
 		UserMaster userMaster = new UserMaster();
 		userMaster.setId(dbuser.getId());
-		userMaster.setEmail(dbuser.getEmail());
-		userMaster.setJoinedOn(dbuser.getJoinedOn());
-		userMaster.setName(dbuser.getName());
-		userMaster.setStatus(dbuser.getStatus());
-		userMaster.setDesignation(dbuser.getDesignation());
-
-		userMaster.setDepartment(userMasterData.getDepartment());
+		userMaster.setEmail(userMasterData.getEmail());
+		userMaster.setName(userMasterData.getName());
 		userMaster.setDob(userMasterData.getDob());
 		userMaster.setFatherName(userMasterData.getFatherName());
-		userMaster.setManager(userMasterData.getManager());
 		userMaster.setPhoto(userMasterData.getPhoto());
 		userMaster.setMobileNumber(userMasterData.getMobileNumber());
 		userMasterRepo.save(userMaster);
-		return "Details updated";
+		return userMasterRepo.findByEmail(email).get();
 	}
 
 	@Override
@@ -253,5 +246,40 @@ public class ClickServiceImpl implements IClickService, UserDetailsService {
         return taskMasterRepo.findAllByOwner(email);
 	}
 
+	@Override
+	public String updateTask(String token, TaskMaster taskData) {
+		if (taskMasterRepo.findById(taskData.getId()).isEmpty()){
+			throw new NoValueException("updateTask", "Bad Request",
+					"There is no such task for id : '"+taskData.getId()+"'");
+		}
+		TaskMaster taskMaster = taskMasterRepo.findById(taskData.getId()).get();
+		taskMaster.setId(taskData.getId());
+		taskMaster.setTaskDescription(taskData.getTaskDescription());
+		taskMaster.setTaskType(taskData.getTaskType());
+		taskMaster.setTaskStatus(taskData.getTaskStatus());
+		taskMaster.setOwner(taskData.getOwner());
+		taskMaster.setAssignedBy(taskData.getAssignedBy());
+		taskMaster.setPriority(taskData.getPriority());
 
+		return "Task Updated";
+	}
+
+	@Override
+	public String updateDeveloperTask(String token, TaskMaster taskData, String developerEmail) {
+		if (taskMasterRepo.findById(taskData.getId()).isEmpty()){
+			throw new NoValueException("updateDeveloperTask", "Bad Request",
+					"There is no such user with with taskId : '"+taskData.getId()+"'");
+		}
+
+		TaskMaster taskMaster = taskMasterRepo.findByIdAndEmail(taskData.getId(), developerEmail);
+		taskMaster.setId(taskMaster.getId());
+		taskMaster.setTaskDescription(taskData.getTaskDescription());
+		taskMaster.setTaskType(taskData.getTaskType());
+		taskMaster.setTaskStatus(taskData.getTaskStatus());
+		taskMaster.setOwner(taskData.getOwner());
+		taskMaster.setAssignedBy(taskData.getAssignedBy());
+		taskMaster.setPriority(taskData.getPriority());
+
+		return "Task Updated";
+	}
 }

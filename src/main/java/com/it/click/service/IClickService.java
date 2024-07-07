@@ -21,7 +21,7 @@ public interface IClickService{
 
 	UserProfileResponse getUserProfile(String token, String email);
 
-	String updateProfile(UserMaster userMasterData, String token);
+	UserMaster updateOwnProfile(UserMaster userMasterData, String token);
 
 	String addSelfTask(String token, TaskMaster taskData);
 
@@ -32,4 +32,8 @@ public interface IClickService{
 	UserMaster getDeveloperProfile(String token, String developerEmail);
 
 	List<TaskMaster> getSelfTasksByToken(String token);
+
+	String updateDeveloperTask(String token, TaskMaster taskData, String developerEmail);
+
+	String updateTask(String token, TaskMaster taskData);
 }
