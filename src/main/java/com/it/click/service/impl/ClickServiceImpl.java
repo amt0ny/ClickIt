@@ -168,14 +168,13 @@ public class ClickServiceImpl implements IClickService, UserDetailsService {
 		}
 		UserMaster userMaster = new UserMaster();
 		userMaster.setId(dbuser.getId());
-		userMaster.setEmail(userMasterData.getEmail());
 		userMaster.setName(userMasterData.getName());
 		userMaster.setDob(userMasterData.getDob());
 		userMaster.setFatherName(userMasterData.getFatherName());
 		userMaster.setPhoto(userMasterData.getPhoto());
 		userMaster.setMobileNumber(userMasterData.getMobileNumber());
 		userMasterRepo.save(userMaster);
-		return userMasterRepo.findByEmail(userMaster.getEmail()).get();
+		return userMasterRepo.findByEmail(email).get();
 	}
 
 	@Override
