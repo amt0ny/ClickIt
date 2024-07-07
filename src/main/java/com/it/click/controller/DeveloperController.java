@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
+@CrossOrigin(origins = "*", methods = { RequestMethod.POST, RequestMethod.GET }, allowedHeaders = "*")
 public class DeveloperController {
 
     @Autowired

@@ -51,6 +51,7 @@ public class ClickServiceImpl implements IClickService, UserDetailsService {
 		newRaegisterData.setPassword(passwordEncoder().encode(registerData.getPassword()));
 		newRaegisterData.setEmail(registerData.getEmail());
 		newRaegisterData.setName(registerData.getName());
+		newRaegisterData.setUserType(registerData.getUserType());
 
 		UserMaster userMaster = new UserMaster();
 		userMaster.setId(id);
@@ -59,6 +60,7 @@ public class ClickServiceImpl implements IClickService, UserDetailsService {
 		System.out.println("=----------------------------"+ newRaegisterData.getEmail());
 		userMaster.setEmail(newRaegisterData.getEmail());
 		userMaster.setStatus("ACTIVE");
+		userMaster.setDesignation(newRaegisterData.getUserType());
 		userMaster.setJoinedOn(LocalDate.now());
 		registerDataRepo.save(newRaegisterData);
 		userMasterRepo.save(userMaster);
