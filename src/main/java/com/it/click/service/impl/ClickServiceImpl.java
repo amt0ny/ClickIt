@@ -175,7 +175,7 @@ public class ClickServiceImpl implements IClickService, UserDetailsService {
 		userMaster.setPhoto(userMasterData.getPhoto());
 		userMaster.setMobileNumber(userMasterData.getMobileNumber());
 		userMasterRepo.save(userMaster);
-		return userMasterRepo.findByEmail(email).get();
+		return userMasterRepo.findByEmail(userMaster.getEmail()).get();
 	}
 
 	@Override
