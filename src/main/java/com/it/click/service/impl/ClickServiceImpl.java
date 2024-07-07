@@ -41,24 +41,27 @@ public class ClickServiceImpl implements IClickService, UserDetailsService {
 
 	@Override
 	public String signUp(RegisterData registerData) {
+		RegisterData newRaegisterData = new RegisterData();
 		if(registerDataRepo.existsByEmail(registerData.getEmail())){
 			throw new NoValueException("signUp", "Bad Request",
 					"Email already registered with us '" + registerData.getEmail() + "'");
 		}
 		String id = UUID.randomUUID().toString().substring(0,8);
-		registerData.setId(id);
-		registerData.setPassword(passwordEncoder().encode(registerData.getPassword()));
-		registerDataRepo.save(registerData);
+		newRaegisterData.setId(id);
+		newRaegisterData.setPassword(passwordEncoder().encode(registerData.getPassword()));
+		newRaegisterData.setEmail(registerData.getEmail());
+		newRaegisterData.setName(registerData.getName());
 
 		UserMaster userMaster = new UserMaster();
-		userMaster.setName(registerData.getName());
-		userMaster.setDesignation(registerData.getUserType());
-		userMaster.setEmail(registerData.getEmail());
 		userMaster.setId(id);
+		userMaster.setName(newRaegisterData.getName());
+		userMaster.setDesignation(newRaegisterData.getUserType());
+		System.out.println("=----------------------------"+ newRaegisterData.getEmail());
+		userMaster.setEmail(newRaegisterData.getEmail());
 		userMaster.setStatus("ACTIVE");
 		userMaster.setJoinedOn(LocalDate.now());
+		registerDataRepo.save(newRaegisterData);
 		userMasterRepo.save(userMaster);
-
 		return "User added";
 	}
 
@@ -159,6 +162,7 @@ public class ClickServiceImpl implements IClickService, UserDetailsService {
 		String token = verifyToken(btoken);
 		String email = jwtService.extractUsername(token);
 		UserMaster dbuser;
+		System.out.println(email+"---------------------------------");
 
 		if (userMasterRepo.findByEmail(email).isEmpty()){
 			throw new NoValueException("updateProfile", "Bad Request",
@@ -168,6 +172,7 @@ public class ClickServiceImpl implements IClickService, UserDetailsService {
 		}
 		UserMaster userMaster = new UserMaster();
 		userMaster.setId(dbuser.getId());
+		userMaster.setEmail(email);
 		userMaster.setName(userMasterData.getName());
 		userMaster.setDob(userMasterData.getDob());
 		userMaster.setFatherName(userMasterData.getFatherName());

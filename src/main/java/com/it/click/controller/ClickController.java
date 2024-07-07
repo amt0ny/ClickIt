@@ -20,7 +20,6 @@ import com.it.click.service.IClickService;
 
 @CrossOrigin(origins = "*", methods = { RequestMethod.POST, RequestMethod.GET }, allowedHeaders = "*")
 @RestController
-@RequestMapping
 public class ClickController {
 
 	@Autowired
@@ -34,11 +33,6 @@ public class ClickController {
 	@PostMapping("/login")
 	public JwtResponse userLogin(@RequestBody LoginData loginData){
 		return clickService.login(loginData);
-	}
-
-	@PostMapping("/updateOwnProfile")
-	public UserMaster updateOwnProfile(@RequestBody UserMaster userMasterData, @RequestHeader String token){
-		return clickService.updateOwnProfile(userMasterData, token);
 	}
 	
 	@GetMapping("/getUserDashBoardByToken")
